@@ -43,7 +43,7 @@ class CM_PT_AssetMarker(Panel):
     bl_label = 'Asset Marker'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'AssetMarker'
+    bl_category = 'Asset Marker'
 
     def draw(self, context):       
         prefix = prefs().collection_prefix.replace(",", " ").split()        
@@ -79,7 +79,7 @@ class AssetMarker_OT_run(Operator):
       
     def mark_asset(self, state = False):
 
-        if self.button_input == 'Objects':
+        if self.button_input == 'Mark_Objects':
             for ob in bpy.data.objects:
                 ob.select_set(True)
                 if state:
@@ -87,21 +87,21 @@ class AssetMarker_OT_run(Operator):
                 else:
                     ob.asset_clear()
                     
-        elif self.button_input == 'Meshes':
+        elif self.button_input == 'Mark_Meshes':
             for ob in bpy.data.meshes:
                 if state:
                     ob.asset_mark()
                 else:
                     ob.asset_clear()
 
-        elif self.button_input == 'Materials':
+        elif self.button_input == 'Mark_Materials':
             for ob in bpy.data.materials:
                 if state:
                     ob.asset_mark()
                 else:
                     ob.asset_clear()
 
-        elif self.button_input == 'Textures':
+        elif self.button_input == 'Mark_Textures':
             for ob in bpy.data.textures:
                 if state:
                     ob.asset_mark()
@@ -117,7 +117,7 @@ class AssetMarkerPreferences(AddonPreferences):
         name="collection_prefix", 
         description="collection_prefix", 
         subtype='NONE',
-        default="Objects, Meshes, Materials, Textures",
+        default="Mark_Objects, Mark_Meshes, Mark_Materials, Mark_Textures",
         update=CM_PT_AssetMarker.draw)     
 
     mesh_type: BoolProperty(

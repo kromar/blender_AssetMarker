@@ -19,59 +19,57 @@
 import bpy
 import sys
 
+#avoid creating backup files
+bpy.context.preferences.filepaths.save_version = 0
+
 argv = sys.argv
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
 
-print(argv[0], argv[1])
+#print(argv[0], argv[1])
 
 # 0 = objects
 # 1 = materials
+# 2 = meshes
+# 3 = textures
 
-if argv[1] == 'False':  
-    state = False
-else:
-    state = True
+#Object 'CysticArtery.001' can't be selected because it is not in View Layer 'Render Layer'!
 
+for v in bpy.data.objects:
+    v.select_set(True)
+    if argv[0] == 'True': 
+        v.asset_mark()
+    else:
+        v.asset_clear()
 
-
-if argv[0] == 'objects':
-    for ob in bpy.data.objects:
-        ob.select_set(True)
-        if state:
-            ob.asset_mark()
+try:
+    for v in bpy.data.materials:
+        if argv[1] == 'True': 
+            v.asset_mark()
         else:
-            ob.asset_clear()
-
-
-
-if argv[0] == 'objects':
-    for ob in bpy.data.objects:
-        ob.select_set(True)
-        if state:
-            ob.asset_mark()
+            v.asset_clear()
+except:
+    pass
+ 
+try:    
+    for v in bpy.data.meshes:
+        if argv[2] == 'True': 
+            v.asset_mark()
         else:
-            ob.asset_clear()
+            v.asset_clear()
+except:
+    pass           
 
-if argv[0] == 'meshes':
-    for ob in bpy.data.meshes:
-        if state:
-            ob.asset_mark()
+try:
+    for v in bpy.data.textures:
+        if argv[3] == 'True': 
+            v.asset_mark()
         else:
-            ob.asset_clear()
+            v.asset_clear()
+except:
+    pass
 
-if argv[0] == 'materials':
-    for ob in bpy.data.materials:
-        if state:
-            ob.asset_mark()
-        else:
-            ob.asset_clear()
-            
-if argv[0] == 'textures':
-    for ob in bpy.data.textures:
-        if state:
-            ob.asset_mark()
-        else:
-            ob.asset_clear()
+
+
 
 
 #save the blend file to store asset marks

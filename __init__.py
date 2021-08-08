@@ -19,7 +19,7 @@
 import bpy
 import os   
 from subprocess import run
-from bpy.types import AddonPreferences, Operator, Panel, PropertyGroup
+from bpy.types import AddonPreferences, Operator, Panel, PropertyGroup, UIList
 from bpy.props import BoolProperty, StringProperty, EnumProperty
 
 
@@ -180,6 +180,7 @@ class AssetWalker(Operator):
 
 
 
+
 lib = []    
 def get_libs():   
     #lib = [v.name, v.name, v.name, 'ASSET_MANAGER', i for i,v in enumerate(bpy.context.preferences.filepaths.asset_libraries)] 
@@ -192,26 +193,6 @@ def get_libs():
 
 class AssetMarkerPreferences(AddonPreferences):
     bl_idname = __package__
-    
-    objects: BoolProperty(
-        name="objects",
-        description="objects",
-        default=True)
-    materials: BoolProperty(
-        name="materials",
-        description="materials",
-        default=True)
-    meshes: BoolProperty(
-        name="meshes",
-        description="meshes",
-        default=False)
-    textures: BoolProperty(
-        name="textures",
-        description="textures",
-        default=False)
-
-        
-
     
     current_file: StringProperty(
         name="current_file", 
@@ -227,6 +208,7 @@ class AssetMarkerPreferences(AddonPreferences):
         ("materials", "Materials", 'Mark Materials as Assets', 'MESH_CIRCLE', 3),
         ("textures", "Textures", 'Mark Textures as Assets', 'MESH_UVSPHERE', 4),
     ]
+
     asset_type: EnumProperty(
         items=type_options,
         description="Select data type to mark as Asset",
@@ -248,25 +230,69 @@ class AssetMarkerPreferences(AddonPreferences):
         default="Default",
     )  
 
+    objects: bpy.props.BoolProperty(
+            name="objects",
+            description="objects",
+            default=True)      
+    materials: bpy.props.BoolProperty(
+            name="materials",
+            description="materials",
+            default=True)    
+
+    '''
+    asset_data = [
+        'actions',
+        'armatures',
+        'brushes',
+        'cameras',
+        'collections',
+        'curves',
+        'fonts',
+        'grease_pencils',
+        'hairs',
+        'images',
+        'lattices',
+        'libraries',
+        'lightprobes',
+        'lights',
+        'linestyles',
+        'masks',
+        'materials',
+        'meshes',
+        'metaballs',
+        'movieclips',
+        'node_groups',
+        'objects',
+        'paint_curves',
+        'palettes',
+        'particles',
+        'pointclouds',
+        'scenes',
+        'screens',
+        'shape_keys',
+        'simulations',
+        'sounds',
+        'speakers',
+        'texts',
+        'textures',
+        'version',
+        'volumes',
+        'workspaces',
+        'worlds',
+    ]
+    #'''
+     
     
     def draw(self, context):
         layout = self.layout
-        
-        lib_path = context.preferences.filepaths.asset_libraries[self.asset_file].name
-        layout.label(text=self.asset_library)        
-
         layout.use_property_split = True 
         #layout.prop(self, 'current_file')
-        #layout.prop(self, 'asset_file')
-
-        layout.prop(self, 'asset_library')        
+        layout.prop(self, 'asset_library')   
         layout.prop(self, 'objects')
         layout.prop(self, 'materials')
-        layout.prop(self, 'meshes')
-        layout.prop(self, 'textures')
-        
         layout.operator(operator="scene.asset_walker", text='Mark Library Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
-
+        #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
+        
 
 
 classes = (

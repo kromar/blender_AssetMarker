@@ -244,22 +244,20 @@ class AssetMarkerPreferences(AddonPreferences):
     
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = False 
-        row = layout.row()
-        row.prop(self, 'asset_library')   
-        row.operator(operator="scene.asset_walker", text='Mark Library Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
-        
-
-        layout.prop(self, 'objects', text='Objects')
-        layout.prop(self, 'materials')
-        layout.prop(self, 'meshes')
-        layout.prop(self, 'textures')
-       #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
-
-        #asset libraries        
         layout.use_property_split = False
-        layout.use_property_decorate = False
+        
+        box = layout.box() 
+        row = box.row()
+        row.prop(self, 'asset_library', text="Mark Assets in")
+        box.operator(operator="scene.asset_walker", text='Mark Library Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
+        
+        box.prop(self, 'objects', text='Objects')
+        box.prop(self, 'materials')
+        box.prop(self, 'meshes')
+        box.prop(self, 'textures')
+        #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
 
+        #asset libraries
         paths = context.preferences.filepaths
 
         box = layout.box()

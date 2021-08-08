@@ -18,10 +18,14 @@
 
 import bpy
 import sys
+
 argv = sys.argv
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
 
-#print(argv[0], argv[1])
+print(argv[0], argv[1])
+
+# 0 = objects
+# 1 = materials
 
 if argv[1] == 'False':  
     state = False
@@ -30,7 +34,7 @@ else:
 
 
 
-if argv[0] == 'Mark_Objects_B':
+if argv[0] == 'objects':
     for ob in bpy.data.objects:
         ob.select_set(True)
         if state:
@@ -38,21 +42,31 @@ if argv[0] == 'Mark_Objects_B':
         else:
             ob.asset_clear()
 
-elif argv[0] == 'Mark_Meshes_B':
+
+
+if argv[0] == 'objects':
+    for ob in bpy.data.objects:
+        ob.select_set(True)
+        if state:
+            ob.asset_mark()
+        else:
+            ob.asset_clear()
+
+if argv[0] == 'meshes':
     for ob in bpy.data.meshes:
         if state:
             ob.asset_mark()
         else:
             ob.asset_clear()
 
-elif argv[0] == 'Mark_Materials_B':
+if argv[0] == 'materials':
     for ob in bpy.data.materials:
         if state:
             ob.asset_mark()
         else:
             ob.asset_clear()
             
-elif argv[0] == 'Mark_Textures_B':
+if argv[0] == 'textures':
     for ob in bpy.data.textures:
         if state:
             ob.asset_mark()

@@ -152,7 +152,6 @@ class AssetWalker(Operator):
         lib = prefs().asset_library
         lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
         
-        state = prefs().objects
         ext = ('.blend')
 
         #print(lib_path)
@@ -162,7 +161,14 @@ class AssetWalker(Operator):
                 if name.endswith(ext):
                     blend_path = os.path.join(path, name)
                     print(blend_path)  # printing file name
-                    run([self.blender_path, blend_path, '--background', '--factory-startup', '--python', self.script_path, '--', 'Mark_Objects_B', str(state)], shell=True) 
+                    run([self.blender_path, 
+                        blend_path, 
+                        '--background', 
+                        '--factory-startup', 
+                        '--python', 
+                        self.script_path, 
+                        '--', str(prefs().objects), str(prefs().materials)
+                    ], shell=True) 
 
 
         """ elif self.button_input == 'Mark_Objects_B':
@@ -288,7 +294,7 @@ class AssetMarkerPreferences(AddonPreferences):
         layout.use_property_split = True 
         #layout.prop(self, 'current_file')
         layout.prop(self, 'asset_library')   
-        layout.prop(self, 'objects')
+        layout.prop(self, 'objects', text='Objects')
         layout.prop(self, 'materials')
         layout.operator(operator="scene.asset_walker", text='Mark Library Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
         #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)

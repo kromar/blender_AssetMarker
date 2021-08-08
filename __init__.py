@@ -210,8 +210,9 @@ class AssetMarkerPreferences(AddonPreferences):
         description="textures",
         default=False)
 
-    items: 
+        
 
+    
     current_file: StringProperty(
         name="current_file", 
         description="current_file", 

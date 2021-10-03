@@ -32,45 +32,64 @@ argv = argv[argv.index("--") + 1:]  # get all args after "--"
 # 2 = meshes
 # 3 = textures
 
-#Object 'CysticArtery.001' can't be selected because it is not in View Layer 'Render Layer'!
+#Object 'name' can't be selected because it is not in View Layer 'Render Layer'!
+for window in bpy.context.window_manager.windows:
+    screen = window.screen
+    for area in screen.areas:
+        if area.type == 'FILE_BROWSER':  
 
-for v in bpy.data.objects:
-    v.select_set(True)
-    if argv[0] == 'True': 
-        v.asset_mark()
-    else:
-        v.asset_clear()
-
-try:
-    for v in bpy.data.materials:
-        if argv[1] == 'True': 
-            v.asset_mark()
-        else:
-            v.asset_clear()
-except:
-    pass
- 
-try:    
-    for v in bpy.data.meshes:
-        if argv[2] == 'True': 
-            v.asset_mark()
-        else:
-            v.asset_clear()
-except:
-    pass           
-
-try:
-    for v in bpy.data.textures:
-        if argv[3] == 'True': 
-            v.asset_mark()
-        else:
-            v.asset_clear()
-except:
-    pass
+            for v in bpy.data.objects:
+                v.select_set(True)
+                if argv[0] == 'True': 
+                    try:
+                        bpy.ops.file.select()
+                        bpy.ops.ed.lib_id_generate_preview()
+                    except:
+                        pass    
+                else:
+                    v.asset_clear()
+                v.select_set(False)
 
 
 
+            try:
+                for v in bpy.data.materials:
+                    if argv[1] == 'True': 
+                        v.asset_mark()
+                        try:
+                            bpy.ops.file.select()
+                            bpy.ops.ed.lib_id_generate_preview()
+                        except:
+                            pass
+                    else:
+                        v.asset_clear()
+            except:
+                pass
+            
+            try:    
+                for v in bpy.data.meshes:
+                    if argv[2] == 'True': 
+                        v.asset_mark()
+                        bpy.ops.ed.lib_id_generate_preview()
+                    else:
+                        v.asset_clear()
+            except:
+                pass           
 
+            try:
+                for v in bpy.data.textures:
+                    if argv[3] == 'True': 
+                        v.asset_mark()
+                        bpy.ops.ed.lib_id_generate_preview()
+                    else:
+                        v.asset_clear()
+            except:
+                pass
+
+#bpy.ops.file.select()
+#bpy.ops.file.select_all(action='SELECT')
+#bpy.ops.wm.previews_batch_generate()
+#bpy.ops.wm.previews_ensure()
 
 #save the blend file to store asset marks
 bpy.ops.wm.save_mainfile()

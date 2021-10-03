@@ -84,38 +84,43 @@ class AssetMarker(Operator):
 
         return{'FINISHED'}
     
-      
+    def set_mark(self, ob, state=False):   
+        if state:
+            ob.asset_mark()
+            try:
+                bpy.ops.file.select()
+                bpy.ops.ed.lib_id_generate_preview()
+            except:
+                pass                                    
+        else:
+            ob.asset_clear()  
+
+
     def mark_asset(self, state = False):
-                
-        if self.button_input == 'Mark_Objects':
-            for ob in bpy.data.objects:
-                ob.select_set(True)
-                if state:
-                    ob.asset_mark()
-                else:
-                    ob.asset_clear()
-                    
-        elif self.button_input == 'Mark_Meshes':
-            for ob in bpy.data.meshes:
-                if state:
-                    ob.asset_mark()
-                else:
-                    ob.asset_clear()
+          
+        for window in bpy.context.window_manager.windows:
+                screen = window.screen
+                for area in screen.areas:
+                    if area.type == 'FILE_BROWSER':  
 
-        elif self.button_input == 'Mark_Materials':
-            for ob in bpy.data.materials:
-                if state:
-                    ob.asset_mark()
-                else:
-                    ob.asset_clear()
+                        if self.button_input == 'Mark_Objects':                                  
+                            for ob in bpy.data.objects:
+                                ob.select_set(True)
+                                self.set_mark(ob, state)                                                               
+                                #ob.select_set(False)
+                                    
+                        elif self.button_input == 'Mark_Meshes':
+                            for ob in bpy.data.meshes:
+                                self.set_mark(ob, state)    
 
-        elif self.button_input == 'Mark_Textures':
-            for ob in bpy.data.textures:
-                if state:
-                    ob.asset_mark()
-                else:
-                    ob.asset_clear()
-        
+                        elif self.button_input == 'Mark_Materials':
+                            for ob in bpy.data.materials:
+                                self.set_mark(ob, state)   
+
+                        elif self.button_input == 'Mark_Textures':
+                            for ob in bpy.data.textures:
+                                self.set_mark(ob, state)  
+                        
    
 class AssetWalker(Operator):
     bl_idname = "scene.asset_walker"

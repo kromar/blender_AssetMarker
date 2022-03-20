@@ -210,7 +210,12 @@ class AssetMarkerPreferences(AddonPreferences):
             description="All Worlds will be marked as Assets",
             default=False)  
 
-    ""
+    """
+    MESH’, ‘CURVE’, ‘SURFACE’, ‘META’, ‘FONT’,     
+    ‘CURVES’, ‘POINTCLOUD’, ‘VOLUME’, ‘GPENCIL’, 
+    ‘ARMATURE’, ‘LATTICE’, ‘EMPTY’, 
+    ‘LIGHT’, ‘LIGHT_PROBE’, ‘CAMERA’, ‘SPEAKER
+    """
 
     '''
     asset_data = [

@@ -25,10 +25,10 @@ from bpy.props import BoolProperty, StringProperty, EnumProperty
 
 bl_info = {
     "name": "Asset Marker",
-    "description": "Mark Assets in blend files",
+    "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 1, 0),
-    "blender": (3, 0, 0),
+    "version": (1, 2, 0),
+    "blender": (3, 1, 0),
     "location": "Sidebar",
     "category": "System",
     "wiki_url": "https://github.com/kromar/blender_AssetMarker",
@@ -84,7 +84,30 @@ class AssetMarker(Operator):
 
         return{'FINISHED'}
     
-    def set_mark(self, ob, state=False):   
+
+    def mark_asset(self, state = False):          
+        for window in bpy.context.window_manager.windows:
+            screen = window.screen
+            for area in screen.areas:
+                if area.type == 'FILE_BROWSER':  
+                    if self.button_input == 'Mark_Objects':                                  
+                        for ob in bpy.data.objects:
+                            ob.select_set(True)
+                            self.set_mark(ob, state)                                                               
+                            #ob.select_set(False)                                    
+                    elif self.button_input == 'Mark_Meshes':
+                        for ob in bpy.data.meshes:
+                            self.set_mark(ob, state)    
+                    elif self.button_input == 'Mark_Materials':
+                        for ob in bpy.data.materials:
+                            self.set_mark(ob, state)  
+                    elif self.button_input == 'Mark_Textures':
+                        for ob in bpy.data.textures:
+                            self.set_mark(ob, state)  
+                           
+                                
+    def set_mark(self, ob, state=False):
+        print("set mark: ", ob.name)   
         if state:
             ob.asset_mark()
             try:
@@ -94,32 +117,6 @@ class AssetMarker(Operator):
                 pass                                    
         else:
             ob.asset_clear()  
-
-
-    def mark_asset(self, state = False):
-          
-        for window in bpy.context.window_manager.windows:
-                screen = window.screen
-                for area in screen.areas:
-                    if area.type == 'FILE_BROWSER':  
-
-                        if self.button_input == 'Mark_Objects':                                  
-                            for ob in bpy.data.objects:
-                                ob.select_set(True)
-                                self.set_mark(ob, state)                                                               
-                                #ob.select_set(False)
-                                    
-                        elif self.button_input == 'Mark_Meshes':
-                            for ob in bpy.data.meshes:
-                                self.set_mark(ob, state)    
-
-                        elif self.button_input == 'Mark_Materials':
-                            for ob in bpy.data.materials:
-                                self.set_mark(ob, state)   
-
-                        elif self.button_input == 'Mark_Textures':
-                            for ob in bpy.data.textures:
-                                self.set_mark(ob, state)  
                         
    
 class AssetWalker(Operator):
@@ -127,26 +124,39 @@ class AssetWalker(Operator):
     bl_label = "asset_walker"
     bl_description = "mark library assets"
     
-    button_input: StringProperty()
     blender_path = bpy.app.binary_path
     addon_path =  os.path.abspath(os.path.dirname(__file__))
-    script_path = os.path.join(addon_path, 'mark_assets.py')        
+    script_path = os.path.join(addon_path, 'mark_assets.py')  
+    
+    button_input: StringProperty()      
 
 
-    def execute(self, context):        
-        self.asset_crawler(context)    
+    def execute(self, context): 
+        print("\nRun Asset Crawler")       
+        self.asset_crawler(context)  
+        for window in bpy.context.window_manager.windows:
+            screen = window.screen
+            for area in screen.areas:
+                if area.type == 'FILE_BROWSER':  
+                    for v in bpy.data.objects:
+                        v.select_set = True
+                        
+
+        bpy.ops.wm.previews_batch_generate()
+        bpy.ops.wm.previews_ensure()
         return{'FINISHED'}
 
             
     def asset_crawler(self, context):
-        # iterating over directory and subdirectory to find all blender files and mark the desired assets
+        # iterating over directory and subdirectory to find all blender files 
+        # and mark the desired assets
         lib = prefs().asset_library
         lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
         for path, dirc, files in os.walk(lib_path):
             for name in files:
                 if name.endswith('.blend'):
                     blend_path = os.path.join(path, name)
-                    #print(blend_path)  # printing file name
+                    print("Opening Asset Library: ", blend_path)
                     run([self.blender_path, 
                         blend_path, 
                         '--background', 
@@ -154,11 +164,14 @@ class AssetWalker(Operator):
                         '--python', 
                         self.script_path, 
                         '--', 
-                        str(prefs().objects), 
-                        str(prefs().materials),
-                        str(prefs().meshes),
-                        str(prefs().textures),
+                        str(prefs().mark_objects), 
+                        str(prefs().mark_materials),
+                        str(prefs().mark_poses),
+                        str(prefs().mark_worlds),
+                        #str(prefs().mark_textures),
                     ], shell=True) 
+        
+        return{'FINISHED'}
 
 
 libraries = []    
@@ -181,26 +194,26 @@ class AssetMarkerPreferences(AddonPreferences):
 
     asset_library: EnumProperty(
         items=libraries,
-        description="Select Asset Library to Mark. Shows configured Asset Libraries",
+        name='',
+        description="Select Asset Library to Mark",
         #default="all",
-        update=get_libs()
-    )
+        update=get_libs())
 
-    objects: bpy.props.BoolProperty(
-            name="objects",
-            description="objects",
+    mark_objects: bpy.props.BoolProperty(
+            name="Objects",
+            description="All Objects will be marked as Assets",
             default=True)      
-    materials: bpy.props.BoolProperty(
-            name="materials",
-            description="materials",
-            default=True)    
-    meshes: bpy.props.BoolProperty(
-            name="meshes",
-            description="meshes",
-            default=False)      
-    textures: bpy.props.BoolProperty(
-            name="textures",
-            description="textures",
+    mark_materials: bpy.props.BoolProperty(
+            name="Materials",
+            description="All Materials will be marked as Assets",
+            default=True)                    
+    mark_poses: bpy.props.BoolProperty(
+            name="Poses",
+            description="All Poses will be marked as Assets",
+            default=False)   
+    mark_worlds: bpy.props.BoolProperty(
+            name="Worlds",
+            description="All Worlds will be marked as Assets",
             default=False)   
 
     '''
@@ -249,23 +262,31 @@ class AssetMarkerPreferences(AddonPreferences):
     
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = False
-        
+        layout.use_property_split = False        
         box = layout.box() 
         row = box.row()
-        row.prop(self, 'asset_library', text="Mark Assets in")
-        box.operator(operator="scene.asset_walker", text='Mark Library Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
-        
-        box.prop(self, 'objects', text='Objects')
-        box.prop(self, 'materials')
-        box.prop(self, 'meshes')
-        box.prop(self, 'textures')
+        row.prop(self, 'asset_library')
+        row.operator(operator="scene.asset_walker", text='Mark Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
+           
+        col = box.column()
+        split = col.split(factor = 0.3)   
+        col1 = split.column()  
+        col2 = split.column()  
+        col3 = split.column()  
+        col1.prop(self, 'mark_objects',icon = 'OBJECT_DATA')
+        col2.prop(self, 'mark_materials', icon = 'MATERIAL')
+        #col2.prop(self, 'mark_textures', icon = 'TEXTURE')
+        col2.prop(self, 'mark_worlds', icon = 'WORLD')
+        col3.prop(self, 'mark_poses', icon = 'POSE_HLT')
+
         #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
 
+        row = box.row()
         #asset libraries
         paths = context.preferences.filepaths
 
         box = layout.box()
+        box.label(text='Asset Libraries')
         split = box.split(factor=0.35)
         name_col = split.column()
         path_col = split.column()

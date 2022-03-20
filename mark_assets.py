@@ -22,74 +22,96 @@ import sys
 #avoid creating backup files
 bpy.context.preferences.filepaths.save_version = 0
 
-argv = sys.argv
+argv = sys.argv     #argguments = [mark_objects, mark_materials, mark_poses, mark_worlds]
+print("argv: ", argv)
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
+print("mark_assets.py: ", argv)
 
-#print(argv[0], argv[1])
-
-# 0 = objects
-# 1 = materials
-# 2 = meshes
-# 3 = textures
 
 #Object 'name' can't be selected because it is not in View Layer 'Render Layer'!
-for window in bpy.context.window_manager.windows:
+""" for window in bpy.context.window_manager.windows:
     screen = window.screen
     for area in screen.areas:
-        if area.type == 'FILE_BROWSER':  
-
-            for v in bpy.data.objects:
-                v.select_set(True)
-                if argv[0] == 'True': 
-                    try:
-                        bpy.ops.file.select()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    except:
-                        pass    
-                else:
-                    v.asset_clear()
-                v.select_set(False)
+        if area.type == 'FILE_BROWSER': """  
+bpy.ops.wm.previews_batch_clear()
 
 
 
-            try:
-                for v in bpy.data.materials:
-                    if argv[1] == 'True': 
-                        v.asset_mark()
-                        try:
-                            bpy.ops.file.select()
-                            bpy.ops.ed.lib_id_generate_preview()
-                        except:
-                            pass
-                    else:
-                        v.asset_clear()
-            except:
-                pass
+try:    
+    if argv[0] == 'True': 
+        print('marking objects')
+        for v in bpy.data.objects:
             
-            try:    
-                for v in bpy.data.meshes:
-                    if argv[2] == 'True': 
-                        v.asset_mark()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    else:
-                        v.asset_clear()
-            except:
-                pass           
+            for i in bpy.data.scenes:
+                for ob in bpy.data.scenes[i].objects:
+                    if ob == v:
+                        print('    ', v.name)
+                        v.asset_mark()  
 
-            try:
-                for v in bpy.data.textures:
-                    if argv[3] == 'True': 
-                        v.asset_mark()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    else:
-                        v.asset_clear()
-            except:
-                pass
+    elif argv[0] == 'False':
+        print('clearing objects')
+        for v in bpy.data.objects:
+            print('    ', v.name) 
+            v.asset_clear()
+except:
+    print("objects exception")
+    pass
 
-#bpy.ops.file.select()
-#bpy.ops.file.select_all(action='SELECT')
-#bpy.ops.wm.previews_batch_generate()
-#bpy.ops.wm.previews_ensure()
+
+try:
+    if argv[1] == 'True': 
+        print('marking materials')
+        for v in bpy.data.materials:
+            print('    ', v.name)
+            v.asset_mark()  
+
+    elif argv[1] == 'False':
+        print('clearing materials')
+        for v in bpy.data.materials:
+            print('    ', v.name) 
+            v.asset_clear()
+            v.use_fake_user = True
+except:
+    print("materials exception")
+    pass
+
+try:
+    if argv[2] == 'True': 
+        print('marking poses')
+        for v in bpy.data.poses:
+            print('    ', v.name)
+            v.asset_mark()  
+
+    elif argv[2] == 'False':
+        print('clearing poses')
+        for v in bpy.data.poses:
+            print('    ', v.name) 
+            v.asset_clear()
+            v.use_fake_user = True
+except:
+    print("poses exception")
+    pass
+
+try:
+    if argv[3] == 'True': 
+        print('marking worlds')
+        for v in bpy.data.worlds:
+            print('    ', v.name)
+            v.asset_mark()  
+
+    elif argv[3] == 'False':
+        print('clearing worlds')
+        for v in bpy.data.worlds:
+            print('    ', v.name) 
+            v.asset_clear()
+            v.use_fake_user = True
+except:
+    print("worlds exception")
+    pass
+
+#update all previews
+bpy.ops.wm.previews_batch_generate()
+bpy.ops.wm.previews_ensure()
 
 #save the blend file to store asset marks
 bpy.ops.wm.save_mainfile()

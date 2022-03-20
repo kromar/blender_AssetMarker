@@ -134,13 +134,7 @@ class AssetWalker(Operator):
     def execute(self, context): 
         print("\nRun Asset Crawler")       
         self.asset_crawler(context)  
-        for window in bpy.context.window_manager.windows:
-            screen = window.screen
-            for area in screen.areas:
-                if area.type == 'FILE_BROWSER':  
-                    for v in bpy.data.objects:
-                        v.select_set = True
-                        
+
 
         bpy.ops.wm.previews_batch_generate()
         bpy.ops.wm.previews_ensure()
@@ -214,7 +208,9 @@ class AssetMarkerPreferences(AddonPreferences):
     mark_worlds: bpy.props.BoolProperty(
             name="Worlds",
             description="All Worlds will be marked as Assets",
-            default=False)   
+            default=False)  
+
+    ""
 
     '''
     asset_data = [

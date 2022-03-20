@@ -35,91 +35,68 @@ print("mark_assets.py: ", argv)
         if area.type == 'FILE_BROWSER': """
 
 
-bpy.ops.wm.previews_batch_clear()
+def process_assets(argv):
+    #bpy.ops.wm.previews_batch_clear()
+    
+    if argv[0] == 'True': 
+        print('marking objects')
+        for ob in bpy.data.objects:
+            for i in bpy.data.scenes:  #only mark objects that are linked to a scene
+                if ob.name in bpy.data.scenes[i.name].objects:
+                    if ob.type == 'MESH':
+                        mark_assets(ob)
+    else:
+        print('clearing objects')
+        for ob in bpy.data.objects:
+            clear_assets(ob)
+        for me in bpy.data.meshes:
+            clear_assets(me)
+
+    if argv[1] == 'True': 
+        print('marking materials')
+        for mat in bpy.data.materials:
+            mark_assets(mat)
+    else:
+        print('clearing materials')
+        for mat in bpy.data.materials:
+            clear_assets(mat)
+
+    """ if argv[2] == 'True': 
+        print('marking poses')
+        for pose in bpy.data.poses:
+            mark_assets(pose)
+
+    else:
+        print('clearing poses')
+        for pose in bpy.data.poses:
+            clear_assets(pose) """
+
+    """ if argv[3] == 'True': 
+        print('marking worlds')
+        for world in bpy.data.worlds:
+            mark_assets(world)
+    else:
+        print('clearing worlds')
+        for world in bpy.data.worlds:
+            clear_assets(world)  """  
+
+    #update all previews
+    #bpy.ops.wm.previews_batch_generate()
+    #bpy.ops.wm.previews_ensure()
+
+    #save the blend file to store asset marks
+    bpy.ops.wm.save_mainfile()
 
 
-if argv[0] == 'True': 
-    print('marking objects')
-    for v in bpy.data.objects:
-        for i in bpy.data.scenes:  #only mark objects that are linked to a scene
-            if v.name in bpy.data.scenes[i.name].objects:
-                if v.type == 'MESH':
-                    print('    3 ', v.name)
-                    v.asset_mark()  
-                    v.asset_generate_preview()
-
-else:
-    print('clearing objects')
-    for v in bpy.data.objects:
-        print('    ', v.name) 
-        v.asset_clear() 
-        v.use_fake_user = True
-
-    for v in bpy.data.meshes:
-        print('    ', v.name) 
-        v.asset_clear()
-        v.use_fake_user = True
+def mark_assets(asset):
+    print('    ', asset.name)
+    asset.asset_mark()  
+    asset.asset_generate_preview()
 
 
-if argv[1] == 'True': 
-    print('marking materials')
-    for v in bpy.data.materials:
-        print('    ', v.name)
-        v.asset_mark()  
-        v.asset_generate_preview()
+def clear_assets(asset):
+    print('    ', asset.name) 
+    asset.asset_clear()
+    asset.use_fake_user = True
 
-else:
-    print('clearing materials')
-    for v in bpy.data.materials:
-        print('    ', v.name) 
-        v.asset_clear()
-        v.use_fake_user = True
-
-
-""" if argv[2] == 'True': 
-    print('marking poses')
-    for v in bpy.data.poses:
-        print('    ', v.name)
-        v.asset_mark()  
-        v.asset_generate_preview()
-
-else:
-    print('clearing poses')
-    for v in bpy.data.poses:
-        print('    ', v.name) 
-        v.asset_clear()
-        v.use_fake_user = True """
-
-
-if argv[3] == 'True': 
-    print('marking worlds')
-    for v in bpy.data.worlds:
-        print('    ', v.name)
-        v.asset_mark()  
-        v.asset_generate_preview()
-
-else:
-    print('clearing worlds')
-    for v in bpy.data.worlds:
-        print('    ', v.name) 
-        v.asset_clear()
-        v.use_fake_user = True
-
-""" 
-for window in bpy.context.window_manager.windows:
-    screen = window.screen
-    for area in screen.areas:
-        if area.type == 'FILE_BROWSER':  
-            for v in bpy.data.objects:
-                v.select_set(True)
-                bpy.ops.ed.lib_id_generate_preview()
-                
-                v.select_set(False) """
-
-#update all previews
-#bpy.ops.wm.previews_batch_generate()
-bpy.ops.wm.previews_ensure()
-
-#save the blend file to store asset marks
-bpy.ops.wm.save_mainfile()
-bpy.ops.wm.quit_blender()
+process_assets(argv=argv)

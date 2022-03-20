@@ -163,8 +163,7 @@ class AssetWalker(Operator):
                         str(prefs().mark_poses),
                         str(prefs().mark_worlds),
                         #str(prefs().mark_textures),
-                    ], shell=True) 
-        
+                    ], shell=False)         
         return{'FINISHED'}
 
 

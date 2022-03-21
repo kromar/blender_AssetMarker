@@ -1,22 +1,18 @@
 import bpy
 
-
-def process_assets(mode):
-    #bpy.ops.wm.previews_batch_clear()
-    
+def process_assets(mode):    
     if mode: 
-        print('marking objects:')
+        print('marking objects:')
         for ob in bpy.data.objects:
             for i in bpy.data.scenes:  #only mark objects that are linked to a scene
                 if ob.name in bpy.data.scenes[i.name].objects and ob.type == 'MESH':
                     mark_assets(ob)
     else:
-        print('clearing objects:')
+        print('clearing objects:')
         for ob in bpy.data.objects:
             clear_assets(ob)
         for me in bpy.data.meshes:
-            clear_assets(me)
-            
+            clear_assets(me)            
 
     if mode:  
         print('marking materials')
@@ -25,20 +21,19 @@ def process_assets(mode):
     else:
         print('clearing materials')
         for mat in bpy.data.materials:
-            clear_assets(mat)
+            clear_assets(mat) 
             
+    #bpy.ops.wm.previews_batch_generate()
+    bpy.ops.wm.previews_ensure()           
 
 def mark_assets(asset):
     print('    ', asset.name)
     asset.asset_mark()  
     asset.asset_generate_preview()
-    return
 
 def clear_assets(asset):
     print('    ', asset.name) 
     asset.asset_clear()
     asset.use_fake_user = True
-    return
-
     
-process_assets(False)
+process_assets(True)

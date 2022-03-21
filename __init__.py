@@ -27,7 +27,7 @@ bl_info = {
     "name": "Asset Marker",
     "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 0),
+    "version": (1, 2, 1),
     "blender": (3, 1, 0),
     "location": "Sidebar",
     "category": "System",
@@ -140,37 +140,42 @@ class AssetWalker(Operator):
     def asset_crawler(self, context):
         # iterating over directory and subdirectory to find all blender files 
         # and mark the desired assets
-        
+    
         lib = prefs().asset_library
         lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
-        for path, dirc, files in os.walk(lib_path):
-            print("amount of files", len(files))
-            
+        for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):
-                    blend_path = os.path.join(path, name)
-                    print("Opening Asset Library: ", blend_path)
-                    run([self.blender_path, 
-                        blend_path, 
-                        '--background', 
-                        '--factory-startup',
-                        '--python', 
-                        self.script_path, 
-                        '--', 
-                        str(prefs().mark_objects), 
-                        str(prefs().mark_materials),
-                        str(prefs().mark_poses),
-                        str(prefs().mark_worlds),
-                        #str(prefs().mark_textures),
-                    ], shell=False)    
+                    #try:
+                        blend_path = os.path.join(path, name)
+                        print("Opening Asset Library: ", blend_path)
+                        run([self.blender_path, 
+                            blend_path, 
+                            '--background', 
+                            '--factory-startup',
+                            '--python', 
+                            self.script_path, 
+                            '--', 
+                            str(prefs().debug_mode),        #0
+                            str(prefs().mark_objects),      #1
+                            str(prefs().mark_materials),    #2
+                            str(prefs().mark_poses),        #3
+                            str(prefs().mark_worlds),       #4
+                        ], shell=False)  
+                    #except:
+                        #print("some issue")  
                 
+            print("amount of files", len(files))  
+
+            """ 
             progress_total = len(files)
             wm = bpy.context.window_manager
             wm.progress_begin(0, progress_total)       
             for i in range(progress_total):
                 wm.progress_update(i)   
                 print(i)
-            wm.progress_end()
+            wm.progress_end() 
+            #"""
 
         return{'FINISHED'}
 
@@ -216,7 +221,11 @@ class AssetMarkerPreferences(AddonPreferences):
             name="Worlds",
             description="All Worlds will be marked as Assets",
             default=False)  
-
+ 
+    debug_mode: bpy.props.BoolProperty(
+            name="debug_mode",
+            description="debug_mode",
+            default=False)  
     """
     'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',     
     'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 
@@ -270,7 +279,9 @@ class AssetMarkerPreferences(AddonPreferences):
     
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = False        
+        layout.use_property_split = False    
+        
+        layout.prop(self, 'debug_mode')    
         box = layout.box() 
         row = box.row()
         row.prop(self, 'asset_library')

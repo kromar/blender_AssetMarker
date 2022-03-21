@@ -28,6 +28,8 @@ argv = argv[argv.index("--") + 1:]  # get all args after "--"
 print("mark_assets.py: ", argv)
 
 
+
+
 #Object 'name' can't be selected because it is not in View Layer 'Render Layer'!
 """ for window in bpy.context.window_manager.windows:
     screen = window.screen
@@ -36,8 +38,8 @@ print("mark_assets.py: ", argv)
 
 
 def process_assets(argv):
-    #bpy.ops.wm.previews_batch_clear()
-    
+    #bpy.ops.wm.previews_batch_clear()   
+
     if argv[0] == 'True': 
         print('marking objects')
         for ob in bpy.data.objects:
@@ -91,7 +93,7 @@ def process_assets(argv):
 def mark_assets(asset):
     print('    ', asset.name)
     asset.asset_mark()  
-    asset.asset_generate_preview()
+    #asset.asset_generate_preview()
 
 
 def clear_assets(asset):
@@ -100,3 +102,9 @@ def clear_assets(asset):
     asset.use_fake_user = True
 
 process_assets(argv=argv)
+
+
+'''
+BLI_assert failed: C:\Repo\BlenderScripts\build_blender\BlenderGit\source\blender\windowmanager\intern\wm_window.c:2315, WM_opengl_context_create(), at 'BLI_thread_is_main()'
+
+'''

@@ -134,19 +134,18 @@ class AssetWalker(Operator):
     def execute(self, context): 
         print("\nRun Asset Crawler")       
         self.asset_crawler(context)  
-
-
-        bpy.ops.wm.previews_batch_generate()
-        bpy.ops.wm.previews_ensure()
         return{'FINISHED'}
 
             
     def asset_crawler(self, context):
         # iterating over directory and subdirectory to find all blender files 
         # and mark the desired assets
+        
         lib = prefs().asset_library
         lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
         for path, dirc, files in os.walk(lib_path):
+            print("amount of files", len(files))
+            
             for name in files:
                 if name.endswith('.blend'):
                     blend_path = os.path.join(path, name)
@@ -163,7 +162,16 @@ class AssetWalker(Operator):
                         str(prefs().mark_poses),
                         str(prefs().mark_worlds),
                         #str(prefs().mark_textures),
-                    ], shell=False)         
+                    ], shell=False)    
+                
+            progress_total = len(files)
+            wm = bpy.context.window_manager
+            wm.progress_begin(0, progress_total)       
+            for i in range(progress_total):
+                wm.progress_update(i)   
+                print(i)
+            wm.progress_end()
+
         return{'FINISHED'}
 
 
@@ -210,10 +218,10 @@ class AssetMarkerPreferences(AddonPreferences):
             default=False)  
 
     """
-    MESH’, ‘CURVE’, ‘SURFACE’, ‘META’, ‘FONT’,     
-    ‘CURVES’, ‘POINTCLOUD’, ‘VOLUME’, ‘GPENCIL’, 
-    ‘ARMATURE’, ‘LATTICE’, ‘EMPTY’, 
-    ‘LIGHT’, ‘LIGHT_PROBE’, ‘CAMERA’, ‘SPEAKER
+    'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',     
+    'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 
+    'ARMATURE', 'LATTICE', 'EMPTY', 
+    'LIGHT', 'LIGHT_PROBE', 'CAMERA', 'SPEAKER
     """
 
     '''

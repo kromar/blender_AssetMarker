@@ -27,7 +27,7 @@ bl_info = {
     "name": "Asset Marker",
     "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 1),
+    "version": (1, 2, 2),
     "blender": (3, 1, 0),
     "location": "Sidebar",
     "category": "System",
@@ -140,15 +140,41 @@ class AssetWalker(Operator):
     def asset_crawler(self, context):
         # iterating over directory and subdirectory to find all blender files 
         # and mark the desired assets
-    
+
+        arg_list = []
+        if prefs().mark_objects:
+            arg_list.append('object_mark')
+        else:            
+            arg_list.append('object_clear')
+
+        if prefs().mark_materials:
+            arg_list.append('materials_mark')
+        else:            
+            arg_list.append('materials_clear')
+
+        if prefs().mark_poses:
+            arg_list.append('poses_mark')
+        else:            
+            arg_list.append('poses_clear')
+
+        if prefs().mark_worlds:
+            arg_list.append('worlds_mark')
+        else:            
+            arg_list.append('worlds_clear')
+
+        print(arg_list)
+        asset_type = ' '.join([str(item) for item in arg_list])
+        print(asset_type)
+
         lib = prefs().asset_library
         lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):
-                    #try:
+                    try:
                         blend_path = os.path.join(path, name)
-                        print("Opening Asset Library: ", blend_path)
+                        print("Opening Asset Library: ", blend_path)     #0
+                        #""" 
                         run([self.blender_path, 
                             blend_path, 
                             '--background', 
@@ -156,14 +182,12 @@ class AssetWalker(Operator):
                             '--python', 
                             self.script_path, 
                             '--', 
-                            str(prefs().debug_mode),        #0
-                            str(prefs().mark_objects),      #1
-                            str(prefs().mark_materials),    #2
-                            str(prefs().mark_poses),        #3
-                            str(prefs().mark_worlds),       #4
+                            str(prefs().debug_mode),    #0
+                            asset_type,                 #1
                         ], shell=False)  
-                    #except:
-                        #print("some issue")  
+                        #""" 
+                    except:
+                        print("cant open %, file corrupt?", name)  
                 
             print("amount of files", len(files))  
 

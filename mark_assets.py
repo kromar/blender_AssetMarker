@@ -28,72 +28,80 @@ argv = sys.argv
 #   1:mark_objects, 
 #   2:mark_materials, 
 #   3:mark_poses, 
-#   4:mark_worlds, 
-# 
+#   4:mark_worlds, # 
+# ]
+
+  
+#argv = [
+#   0:debug_mode
+#   1:
 # ]
 
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
+debug = False
 if argv[0] == 'True':
-    print("mark_assets.py: ", argv)
-
-
-#Object 'name' can't be selected because it is not in View Layer 'Render Layer'!
-""" for window in bpy.context.window_manager.windows:
-    screen = window.screen
-    for area in screen.areas:
-        if area.type == 'FILE_BROWSER': """
+    debug = True
+else:
+    debug = False
 
 
 def process_assets(argv):
-    #bpy.ops.wm.previews_batch_clear()
-    if argv[1] == 'True':         
-        if argv[0] == 'True':
+    asset_type = argv[1].split()
+    if not debug:
+        print("asset_type: ", asset_type)    
+    if 'object_mark' in asset_type:
+        if debug:
             print('marking objects')
         for ob in bpy.data.objects:
             for i in bpy.data.scenes:  #only mark objects that are linked to a scene
                 if ob.name in bpy.data.scenes[i.name].objects:
                     if ob.type == 'MESH':
                         mark_assets(ob)
-    else:
-        if argv[0] == 'True':
+
+    if 'object_clear' in asset_type:
+        if debug:
             print('clearing objects')
         for ob in bpy.data.objects:
             clear_assets(ob)
         for me in bpy.data.meshes:
             clear_assets(me)
 
-    if argv[2] == 'True': 
-        if argv[0] == 'True':
+            
+    if 'materials_mark' in asset_type:
+        if debug:
             print('marking materials')
         for mat in bpy.data.materials:
-            mark_assets(mat)
-    else:
-        if argv[0] == 'True':
+            mark_assets(mat)    
+    if 'materials_clear' in asset_type:
+        if debug:
             print('clearing materials')
         for mat in bpy.data.materials:
             clear_assets(mat)
 
-    """ if argv[3] == 'True': 
-        if argv[0] == 'True':
+    """ 
+    if 'poses_mark' in asset_type:
+        if debug:
             print('marking poses')
         for pose in bpy.data.poses:
             mark_assets(pose)
-
-    else:
-        if argv[0] == 'True':
+    if 'poses_clear' in asset_type:
+        if debug:
             print('clearing poses')
         for pose in bpy.data.poses:
-            clear_assets(pose) """
+            clear_assets(pose) 
+    #"""
 
-    """ if argv[4] == 'True':
-            if argv[0] == 'True': 
-                print('marking worlds')
+    """ 
+    if 'worlds_mark' in asset_type:
+        if debug: 
+            print('marking worlds')
         for world in bpy.data.worlds:
             mark_assets(world)
-    else:
+    if 'worlds_clear' in asset_type:
         print('clearing worlds')
         for world in bpy.data.worlds:
-            clear_assets(world)  """  
+            clear_assets(world)  
+    #"""  
 
     #update all previews
     bpy.ops.wm.previews_ensure()
@@ -103,17 +111,18 @@ def process_assets(argv):
 
 
 def mark_assets(asset):
-    if argv[0] == 'True':
+    if debug:
         print('    ', asset.name)
     asset.asset_mark()  
     #asset.asset_generate_preview()
 
 
 def clear_assets(asset):
-    if argv[0] == 'True':
+    if debug:
         print('    ', asset.name) 
     asset.asset_clear()
     asset.use_fake_user = True
+
 
 process_assets(argv=argv)
 

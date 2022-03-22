@@ -167,11 +167,8 @@ class AssetWalker(Operator):
         asset_type = ' '.join([str(item) for item in arg_list])
         print(asset_type)
 
-        #lib = prefs().asset_library
-        #lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
-        
         paths = context.preferences.filepaths
-        print("ASSET LIB: ", paths.asset_libraries[self.index].name)
+        #print("ASSET LIB: ", paths.asset_libraries[self.index].name)
         lib_path = paths.asset_libraries[self.index].path
 
         for path, dirc, files in os.walk(lib_path):          
@@ -210,14 +207,6 @@ class AssetWalker(Operator):
         return{'FINISHED'}
 
 
-libraries = []    
-def get_libs():  
-    libraries.clear()
-    #("all", "Blend File", 'Mark all Assets', 'FILE_BLEND', 0)
-    for i,v in enumerate(bpy.context.preferences.filepaths.asset_libraries):
-        libraries.append((v.name, v.name, v.name, 'ASSET_MANAGER', i))
-
-
 class AssetMarkerPreferences(AddonPreferences):
     bl_idname = __package__
     
@@ -226,14 +215,7 @@ class AssetMarkerPreferences(AddonPreferences):
         description="current_file", 
         subtype='NONE',
         default="Mark_Objects, Mark_Meshes, Mark_Materials, Mark_Textures",
-        update=AM_PT_AssetMarker.draw)     
-
-    asset_library: EnumProperty(
-        items=libraries,
-        name='',
-        description="Select Asset Library to Mark",
-        #default="all",
-        update=get_libs())
+        update=AM_PT_AssetMarker.draw)
 
     mark_objects: bpy.props.BoolProperty(
             name="Objects",
@@ -273,9 +255,7 @@ class AssetMarkerPreferences(AddonPreferences):
         layout.prop(self, 'debug_mode')    
         box = layout.box() 
         row = box.row()
-        #row.prop(self, 'asset_library')
-        #row.operator(operator="scene.asset_walker", icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
-           
+        
         col = box.column()
         split = col.split(factor = 0.3)   
         col1 = split.column()  

@@ -22,19 +22,10 @@ import sys
 #avoid creating backup files
 bpy.context.preferences.filepaths.save_version = 0
 
-argv = sys.argv     
+argv = sys.argv  
 #argv = [
 #   0:debug_mode
-#   1:mark_objects, 
-#   2:mark_materials, 
-#   3:mark_poses, 
-#   4:mark_worlds, # 
-# ]
-
-  
-#argv = [
-#   0:debug_mode
-#   1:
+#   1:asset_type
 # ]
 
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
@@ -47,7 +38,7 @@ else:
 
 def process_assets(argv):
     asset_type = argv[1].split()
-    if not debug:
+    if debug:
         print("asset_type: ", asset_type)    
     if 'object_mark' in asset_type:
         if debug:

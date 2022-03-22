@@ -20,7 +20,7 @@ import bpy
 import os   
 from subprocess import run
 from bpy.types import AddonPreferences, Operator, Panel
-from bpy.props import BoolProperty, StringProperty, EnumProperty
+from bpy.props import BoolProperty, StringProperty, EnumProperty, IntProperty
 
 
 bl_info = {
@@ -112,7 +112,7 @@ class AssetMarker(Operator):
             ob.asset_mark()
             try:
                 bpy.ops.file.select()
-                bpy.ops.ed.lib_id_generate_preview()
+                #bpy.ops.ed.lib_id_generate_preview()
             except:
                 pass                                    
         else:
@@ -121,7 +121,7 @@ class AssetMarker(Operator):
    
 class AssetWalker(Operator):
     bl_idname = "scene.asset_walker"
-    bl_label = "asset_walker"
+    bl_label = "Mark Assets"
     bl_description = "mark library assets"
     
     blender_path = bpy.app.binary_path
@@ -129,10 +129,11 @@ class AssetWalker(Operator):
     script_path = os.path.join(addon_path, 'mark_assets.py')  
     
     button_input: StringProperty()      
-
+    index: IntProperty()
 
     def execute(self, context): 
-        print("\nRun Asset Crawler")       
+        print("\nRun Asset Crawler")  
+
         self.asset_crawler(context)  
         return{'FINISHED'}
 
@@ -166,8 +167,13 @@ class AssetWalker(Operator):
         asset_type = ' '.join([str(item) for item in arg_list])
         print(asset_type)
 
-        lib = prefs().asset_library
-        lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
+        #lib = prefs().asset_library
+        #lib_path =  bpy.context.preferences.filepaths.asset_libraries[lib].path
+        
+        paths = context.preferences.filepaths
+        print("ASSET LIB: ", paths.asset_libraries[self.index].name)
+        lib_path = paths.asset_libraries[self.index].path
+
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):
@@ -189,7 +195,7 @@ class AssetWalker(Operator):
                     except:
                         print("cant open %, file corrupt?", name)  
                 
-            print("amount of files", len(files))  
+            #print("amount of files", len(files))  
 
             """ 
             progress_total = len(files)
@@ -232,7 +238,15 @@ class AssetMarkerPreferences(AddonPreferences):
     mark_objects: bpy.props.BoolProperty(
             name="Objects",
             description="All Objects will be marked as Assets",
-            default=True)      
+            default=True)   
+            
+    """
+    'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',     
+    'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 
+    'ARMATURE', 'LATTICE', 'EMPTY', 
+    'LIGHT', 'LIGHT_PROBE', 'CAMERA', 'SPEAKER
+    """
+
     mark_materials: bpy.props.BoolProperty(
             name="Materials",
             description="All Materials will be marked as Assets",
@@ -250,55 +264,6 @@ class AssetMarkerPreferences(AddonPreferences):
             name="debug_mode",
             description="debug_mode",
             default=False)  
-    """
-    'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',     
-    'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 
-    'ARMATURE', 'LATTICE', 'EMPTY', 
-    'LIGHT', 'LIGHT_PROBE', 'CAMERA', 'SPEAKER
-    """
-
-    '''
-    asset_data = [
-        'actions',
-        'armatures',
-        'brushes',
-        'cameras',
-        'collections',
-        'curves',
-        'fonts',
-        'grease_pencils',
-        'hairs',
-        'images',
-        'lattices',
-        'libraries',
-        'lightprobes',
-        'lights',
-        'linestyles',
-        'masks',
-        'materials',
-        'meshes',
-        'metaballs',
-        'movieclips',
-        'node_groups',
-        'objects',
-        'paint_curves',
-        'palettes',
-        'particles',
-        'pointclouds',
-        'scenes',
-        'screens',
-        'shape_keys',
-        'simulations',
-        'sounds',
-        'speakers',
-        'texts',
-        'textures',
-        'version',
-        'volumes',
-        'workspaces',
-        'worlds',
-    ]
-    #'''
      
     
     def draw(self, context):
@@ -308,8 +273,8 @@ class AssetMarkerPreferences(AddonPreferences):
         layout.prop(self, 'debug_mode')    
         box = layout.box() 
         row = box.row()
-        row.prop(self, 'asset_library')
-        row.operator(operator="scene.asset_walker", text='Mark Assets', icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
+        #row.prop(self, 'asset_library')
+        #row.operator(operator="scene.asset_walker", icon='FILE_BLEND', emboss=True, depress=False).button_input = 'walk_files'
            
         col = box.column()
         split = col.split(factor = 0.3)   
@@ -347,6 +312,8 @@ class AssetMarkerPreferences(AddonPreferences):
             row = path_col.row()
             row.prop(library, "path", text="")
             row.operator("preferences.asset_library_remove", text="", icon='X', emboss=False).index = i
+            row.operator(operator="scene.asset_walker", icon='FILE_BLEND', emboss=True, depress=False).index = i
+         
         row = box.row()
         row.alignment = 'LEFT'
         row.operator("preferences.asset_library_add", text="", icon='ADD', emboss=False)

@@ -69,7 +69,7 @@ def process_assets(argv):
         for mat in bpy.data.materials:
             clear_assets(mat)
 
-    """ 
+    #""" 
     if 'poses_mark' in asset_type:
         if debug:
             print('marking poses')
@@ -82,7 +82,7 @@ def process_assets(argv):
             clear_assets(pose) 
     #"""
 
-    """ 
+     
     if 'worlds_mark' in asset_type:
         if debug: 
             print('marking worlds')
@@ -92,7 +92,7 @@ def process_assets(argv):
         print('clearing worlds')
         for world in bpy.data.worlds:
             clear_assets(world)  
-    #"""  
+     
 
     #update all previews
     bpy.ops.wm.previews_ensure()

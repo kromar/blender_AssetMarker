@@ -27,7 +27,7 @@ bl_info = {
     "name": "Asset Marker",
     "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 2),
+    "version": (1, 2, 3),
     "blender": (3, 1, 0),
     "location": "Sidebar",
     "category": "System",
@@ -129,7 +129,7 @@ class AssetWalker(Operator):
     script_path = os.path.join(addon_path, 'mark_assets.py')  
     
     button_input: StringProperty()      
-    index: IntProperty()
+    library_index: IntProperty()
 
     def execute(self, context): 
         print("\nRun Asset Crawler")  
@@ -137,11 +137,7 @@ class AssetWalker(Operator):
         self.asset_crawler(context)  
         return{'FINISHED'}
 
-            
-    def asset_crawler(self, context):
-        # iterating over directory and subdirectory to find all blender files 
-        # and mark the desired assets
-
+    def convert_args_to_cmdlist():
         arg_list = []
         if prefs().mark_objects:
             arg_list.append('object_mark')
@@ -166,9 +162,17 @@ class AssetWalker(Operator):
         asset_type = ' '.join([str(item) for item in arg_list])
         #print(arg_list)
         #print(asset_type)
+        return asset_type
+
+
+    def asset_crawler(self, context):
+        # iterating over directory and subdirectory to find all blender files 
+        # and mark the desired assets
+
+        asset_type = self.convert_args_to_cmdlist()
 
         paths = context.preferences.filepaths
-        #print("Asset Library: ", paths.asset_libraries[self.index].name)
+        #print("Asset Library: ", paths.asset_libraries[self.library_index].name)
         lib_path = paths.asset_libraries[self.index].path
 
         for path, dirc, files in os.walk(lib_path):          
@@ -222,12 +226,76 @@ class AssetMarkerPreferences(AddonPreferences):
             description="All Objects will be marked as Assets",
             default=True)   
             
-    """
-    'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',     
-    'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 
-    'ARMATURE', 'LATTICE', 'EMPTY', 
-    'LIGHT', 'LIGHT_PROBE', 'CAMERA', 'SPEAKER
-    """
+    custom_object_types: bpy.props.BoolProperty(
+            name="Customize Object Types",
+            description="debug_mode",
+            default=True)  
+
+    mark_meshes: bpy.props.BoolProperty(
+            name="Mesh",
+            description="All Meshes will be marked as Assets",
+            default=True)  
+    mark_surface: bpy.props.BoolProperty(
+            name="Surface",
+            description="All Surfaces will be marked as Assets",
+            default=True) 
+    mark_meta: bpy.props.BoolProperty(
+            name="Meta",
+            description="All Metas will be marked as Assets",
+            default=True) 
+    mark_curve: bpy.props.BoolProperty(
+            name="Curve",
+            description="All Curves will be marked as Assets",
+            default=True) 
+    mark_font: bpy.props.BoolProperty(
+            name="Font",
+            description="All Fonts will be marked as Assets",
+            default=True) 
+    mark_curves: bpy.props.BoolProperty(
+            name="Curves",
+            description="All Curves will be marked as Assets",
+            default=True) 
+    mark_pointcloud: bpy.props.BoolProperty(
+            name="Pointcloud",
+            description="All Pointclouds will be marked as Assets",
+            default=True) 
+    mark_volume: bpy.props.BoolProperty(
+            name="Volume",
+            description="All Volumes will be marked as Assets",
+            default=True) 
+    mark_greasepencil: bpy.props.BoolProperty(
+            name="Grease Pencil",
+            description="All Grease Pencils will be marked as Assets",
+            default=True) 
+    mark_armature: bpy.props.BoolProperty(
+            name="Armatures",
+            description="All Armatures will be marked as Assets",
+            default=True) 
+    mark_lattice: bpy.props.BoolProperty(
+            name="Lattice",
+            description="All Lattices will be marked as Assets",
+            default=True) 
+    mark_empty: bpy.props.BoolProperty(
+            name="Empties",
+            description="All Empties will be marked as Assets",
+            default=True) 
+    mark_light: bpy.props.BoolProperty(
+            name="Light",
+            description="All Lights will be marked as Assets",
+            default=True) 
+    mark_lightprobe: bpy.props.BoolProperty(
+            name="Lightprobe",
+            description="All Lightprobes will be marked as Assets",
+            default=True) 
+    mark_camera: bpy.props.BoolProperty(
+            name="Camera",
+            description="All Cameras will be marked as Assets",
+            default=True) 
+    mark_speaker: bpy.props.BoolProperty(
+            name="Speaker",
+            description="All Speakers will be marked as Assets",
+            default=True) 
+               
 
     mark_materials: bpy.props.BoolProperty(
             name="Materials",
@@ -246,34 +314,18 @@ class AssetMarkerPreferences(AddonPreferences):
             name="debug_mode",
             description="debug_mode",
             default=False)  
+            
      
     
     def draw(self, context):
         layout = self.layout
-        layout.use_property_split = False    
-        
+        layout.use_property_split = False            
         layout.prop(self, 'debug_mode')    
-        box = layout.box() 
-        row = box.row()
         
-        col = box.column()
-        split = col.split(factor = 0.3)   
-        col1 = split.column()  
-        col2 = split.column()  
-        col3 = split.column()  
-        col1.prop(self, 'mark_objects',icon = 'OBJECT_DATA')
-        col2.prop(self, 'mark_materials', icon = 'MATERIAL')
-        #col2.prop(self, 'mark_textures', icon = 'TEXTURE')
-        col2.prop(self, 'mark_worlds', icon = 'WORLD')
-        col3.prop(self, 'mark_poses', icon = 'POSE_HLT')
-
-        #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
-
-        row = box.row()
         #asset libraries
         paths = context.preferences.filepaths
-
         box = layout.box()
+        row = box.row()
         box.label(text='Asset Libraries')
         split = box.split(factor=0.3)
         name_col = split.column()
@@ -297,12 +349,52 @@ class AssetMarkerPreferences(AddonPreferences):
             row = path_col.row()
             row.prop(library, "path", text="") 
             row = asset_col.row()           
-            row.operator(operator="scene.asset_walker", icon='ASSET_MANAGER', emboss=True, depress=False).index = i
+            row.operator(operator="scene.asset_walker", icon='ASSET_MANAGER', emboss=True, depress=False).library_index = i
             row.operator("preferences.asset_library_remove", text="", icon='TRASH', emboss=True).index = i
          
         row = box.row()
         row.alignment = 'LEFT'
         row.operator("preferences.asset_library_add", text="", icon='ADD', emboss=False)
+        
+
+        # Asset Marker selection
+        box = layout.box() 
+        box.label(text='Asset Marker Configuration')
+        box.label(text='Active Buttons will Mark Assets, Inactive Buttons will Clear Assets from the Library')
+        
+        row = box.row()        
+        col = box.column()
+        split = col.split()   
+        col1 = split.column()  
+        col2 = split.column()  
+        col3 = split.column()  
+
+        col1.prop(self, 'mark_objects',icon = 'OBJECT_DATA')
+        col1.prop(self, 'custom_object_types')
+        col1 = col1.column(align=True) 
+        if self.custom_object_types:
+            col1.prop(self, 'mark_meshes',icon = 'OUTLINER_OB_MESH')
+            col1.prop(self, 'mark_surface',icon = 'OUTLINER_OB_SURFACE')
+            col1.prop(self, 'mark_meta',icon = 'OUTLINER_OB_META')
+            col1.prop(self, 'mark_curve',icon = 'OUTLINER_OB_CURVE')
+            col1.prop(self, 'mark_font',icon = 'OUTLINER_OB_FONT')
+            col1.prop(self, 'mark_curves',icon = 'OUTLINER_OB_CURVES')
+            col1.prop(self, 'mark_pointcloud',icon = 'OUTLINER_OB_POINTCLOUD')
+            col1.prop(self, 'mark_volume',icon = 'OUTLINER_OB_VOLUME')
+            col1.prop(self, 'mark_greasepencil',icon = 'OUTLINER_OB_GREASEPENCIL')
+            col1.prop(self, 'mark_armature',icon = 'OUTLINER_OB_ARMATURE')
+            col1.prop(self, 'mark_lattice',icon = 'OUTLINER_OB_LATTICE')
+            col1.prop(self, 'mark_empty',icon = 'OUTLINER_OB_EMPTY')
+            col1.prop(self, 'mark_light',icon = 'OUTLINER_OB_LIGHT')
+            col1.prop(self, 'mark_lightprobe',icon = 'OUTLINER_OB_LIGHTPROBE')
+            col1.prop(self, 'mark_camera',icon = 'OUTLINER_OB_CAMERA')
+            col1.prop(self, 'mark_speaker',icon = 'OUTLINER_OB_SPEAKER')
+               
+        col2.prop(self, 'mark_materials', icon = 'MATERIAL')
+        col2.prop(self, 'mark_worlds', icon = 'WORLD')
+        col3.prop(self, 'mark_poses', icon = 'POSE_HLT')
+
+        #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
 
 
 

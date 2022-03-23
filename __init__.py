@@ -163,12 +163,12 @@ class AssetWalker(Operator):
         else:            
             arg_list.append('worlds_clear')
 
-        print(arg_list)
         asset_type = ' '.join([str(item) for item in arg_list])
-        print(asset_type)
+        #print(arg_list)
+        #print(asset_type)
 
         paths = context.preferences.filepaths
-        #print("ASSET LIB: ", paths.asset_libraries[self.index].name)
+        #print("Asset Library: ", paths.asset_libraries[self.index].name)
         lib_path = paths.asset_libraries[self.index].path
 
         for path, dirc, files in os.walk(lib_path):          
@@ -275,9 +275,10 @@ class AssetMarkerPreferences(AddonPreferences):
 
         box = layout.box()
         box.label(text='Asset Libraries')
-        split = box.split(factor=0.35)
+        split = box.split(factor=0.3)
         name_col = split.column()
         path_col = split.column()
+        asset_col = split.column()
 
         row = name_col.row(align=True)  # Padding
         row.separator()
@@ -287,12 +288,17 @@ class AssetMarkerPreferences(AddonPreferences):
         row.separator()
         row.label(text="Path")
 
+        row = asset_col.row(align=True)  # Padding
+        row.separator()
+        row.label(text="Asset Marker")
+
         for i, library in enumerate(paths.asset_libraries):
             name_col.prop(library, "name", text="")
             row = path_col.row()
-            row.prop(library, "path", text="")
-            row.operator("preferences.asset_library_remove", text="", icon='X', emboss=False).index = i
-            row.operator(operator="scene.asset_walker", icon='FILE_BLEND', emboss=True, depress=False).index = i
+            row.prop(library, "path", text="") 
+            row = asset_col.row()           
+            row.operator(operator="scene.asset_walker", icon='ASSET_MANAGER', emboss=True, depress=False).index = i
+            row.operator("preferences.asset_library_remove", text="", icon='TRASH', emboss=True).index = i
          
         row = box.row()
         row.alignment = 'LEFT'

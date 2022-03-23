@@ -32,26 +32,120 @@ argv = argv[argv.index("--") + 1:]  # get all args after "--"
 debug = False
 if argv[0] == 'True':
     debug = True
+    print(argv)
 else:
     debug = False
 
 
 def process_assets(argv):
     asset_type = argv[1].split()
-    if debug:
+    if not debug:
         print("asset_type: ", asset_type)    
-    if 'object_mark' in asset_type:
-        if debug:
-            print('marking objects')
+    if 'mark_object' in asset_type:
         for ob in bpy.data.objects:
             for i in bpy.data.scenes:  #only mark objects that are linked to a scene
                 if ob.name in bpy.data.scenes[i.name].objects:
+                    
                     if ob.type == 'MESH':
-                        mark_assets(ob)
+                        if 'mark_mesh' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_mesh' in asset_type:
+                            clear_assets(ob)
 
-    if 'object_clear' in asset_type:
-        if debug:
-            print('clearing objects')
+                    if ob.type == 'SURFACE':
+                        if 'mark_surface' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_surface' in asset_type:
+                            clear_assets(ob)
+                    
+                    if ob.type == 'META':
+                        if 'mark_meta' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_meta' in asset_type:
+                            clear_assets(ob)
+
+                    if ob.type == 'CURVE':    
+                        if 'mark_curve' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_curve' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'FONT':
+                        if 'mark_font' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_font' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'CURVES':
+                        if 'mark_curves' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_curves' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'POINTCLOUD':
+                        if 'mark_pointcloud' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_pointcloud' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'VOLUME':
+                        if 'mark_volume' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_volume' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'GPENCIL':
+                        if 'mark_greasepencil' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_greasepencil' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'ARMATURE':
+                        if 'mark_armature' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_armature' in asset_type:
+                            clear_assets(ob)
+                    
+                    if ob.type == 'LATTICE':
+                        if 'mark_lattice' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_lattice' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'EMPTY':
+                        if 'mark_empty' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_empty' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'LIGHT': 
+                        if 'mark_light' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_light' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'LIGHTPROBE':
+                        if 'mark_lightprobe' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_lightprobe' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'CAMERA':
+                        if 'mark_camera' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_camera' in asset_type:
+                            clear_assets(ob)
+
+                    if ob.type == 'SPEAKER':
+                        if 'mark_speaker' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_speaker' in asset_type:
+                            clear_assets(ob)
+                        
+
+
+
+    if 'clear_object' in asset_type:
         for ob in bpy.data.objects:
             clear_assets(ob)
         for me in bpy.data.meshes:
@@ -59,37 +153,26 @@ def process_assets(argv):
 
             
     if 'materials_mark' in asset_type:
-        if debug:
-            print('marking materials')
         for mat in bpy.data.materials:
             mark_assets(mat)    
     if 'materials_clear' in asset_type:
-        if debug:
-            print('clearing materials')
         for mat in bpy.data.materials:
             clear_assets(mat)
 
-    #""" 
+    """ 
     if 'poses_mark' in asset_type:
-        if debug:
-            print('marking poses')
         for pose in bpy.data.poses:
             mark_assets(pose)
     if 'poses_clear' in asset_type:
-        if debug:
-            print('clearing poses')
         for pose in bpy.data.poses:
             clear_assets(pose) 
     #"""
 
      
     if 'worlds_mark' in asset_type:
-        if debug: 
-            print('marking worlds')
         for world in bpy.data.worlds:
             mark_assets(world)
     if 'worlds_clear' in asset_type:
-        print('clearing worlds')
         for world in bpy.data.worlds:
             clear_assets(world)  
      
@@ -103,14 +186,15 @@ def process_assets(argv):
 
 def mark_assets(asset):
     if debug:
-        print('    ', asset.name)
+        print('    marking: ', asset.name)
     asset.asset_mark()  
-    #asset.asset_generate_preview()
+    if not debug:
+        asset.asset_generate_preview()
 
 
 def clear_assets(asset):
     if debug:
-        print('    ', asset.name) 
+        print('    clearing: ', asset.name) 
     asset.asset_clear()
     asset.use_fake_user = True
 

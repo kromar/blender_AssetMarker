@@ -137,12 +137,79 @@ class AssetWalker(Operator):
         self.asset_crawler(context)  
         return{'FINISHED'}
 
-    def convert_args_to_cmdlist():
+    def convert_args_to_cmdlist(self):
         arg_list = []
         if prefs().mark_objects:
-            arg_list.append('object_mark')
+            arg_list.append('mark_object')
         else:            
-            arg_list.append('object_clear')
+            arg_list.append('clear_object')
+
+            
+        if prefs().mark_mesh:
+            arg_list.append('mark_mesh')
+        else:            
+            arg_list.append('clear_mesh')
+        if prefs().mark_surface:
+            arg_list.append('mark_surface')
+        else:            
+            arg_list.append('clear_surface')
+        if prefs().mark_meta:
+            arg_list.append('mark_meta')
+        else:            
+            arg_list.append('clear_meta')
+        if prefs().mark_curve:
+            arg_list.append('mark_curve')
+        else:            
+            arg_list.append('clear_curve')
+        if prefs().mark_font:
+            arg_list.append('mark_font')
+        else:            
+            arg_list.append('clear_font')
+        if prefs().mark_curves:
+            arg_list.append('mark_curves')
+        else:            
+            arg_list.append('clear_curves')
+        if prefs().mark_pointcloud:
+            arg_list.append('mark_pointcloud')
+        else:            
+            arg_list.append('clear_pointcloud')
+        if prefs().mark_volume:
+            arg_list.append('mark_volume')
+        else:            
+            arg_list.append('clear_volume')
+        if prefs().mark_greasepencil:
+            arg_list.append('mark_greasepencil')
+        else:            
+            arg_list.append('clear_greasepencil')
+        if prefs().mark_armature:
+            arg_list.append('mark_armature')
+        else:            
+            arg_list.append('clear_armature')
+        if prefs().mark_lattice:
+            arg_list.append('mark_lattice')
+        else:            
+            arg_list.append('clear_lattice')
+        if prefs().mark_empty:
+            arg_list.append('mark_empty')
+        else:            
+            arg_list.append('clear_empty')
+        if prefs().mark_light:
+            arg_list.append('mark_light')
+        else:            
+            arg_list.append('clear_light')
+        if prefs().mark_lightprobe:
+            arg_list.append('mark_lightprobe')
+        else:            
+            arg_list.append('clear_lightprobe')
+        if prefs().mark_camera:
+            arg_list.append('mark_camera')
+        else:            
+            arg_list.append('clear_camera')
+        if prefs().mark_speaker:
+            arg_list.append('mark_speaker')
+        else:            
+            arg_list.append('clear_speaker')
+
 
         if prefs().mark_materials:
             arg_list.append('materials_mark')
@@ -173,7 +240,7 @@ class AssetWalker(Operator):
 
         paths = context.preferences.filepaths
         #print("Asset Library: ", paths.asset_libraries[self.library_index].name)
-        lib_path = paths.asset_libraries[self.index].path
+        lib_path = paths.asset_libraries[self.library_index].path
 
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
@@ -229,9 +296,9 @@ class AssetMarkerPreferences(AddonPreferences):
     custom_object_types: bpy.props.BoolProperty(
             name="Customize Object Types",
             description="debug_mode",
-            default=True)  
+            default=False)  
 
-    mark_meshes: bpy.props.BoolProperty(
+    mark_mesh: bpy.props.BoolProperty(
             name="Mesh",
             description="All Meshes will be marked as Assets",
             default=True)  
@@ -243,6 +310,8 @@ class AssetMarkerPreferences(AddonPreferences):
             name="Meta",
             description="All Metas will be marked as Assets",
             default=True) 
+
+
     mark_curve: bpy.props.BoolProperty(
             name="Curve",
             description="All Curves will be marked as Assets",
@@ -370,25 +439,26 @@ class AssetMarkerPreferences(AddonPreferences):
         col3 = split.column()  
 
         col1.prop(self, 'mark_objects',icon = 'OBJECT_DATA')
-        col1.prop(self, 'custom_object_types')
-        col1 = col1.column(align=True) 
-        if self.custom_object_types:
-            col1.prop(self, 'mark_meshes',icon = 'OUTLINER_OB_MESH')
-            col1.prop(self, 'mark_surface',icon = 'OUTLINER_OB_SURFACE')
-            col1.prop(self, 'mark_meta',icon = 'OUTLINER_OB_META')
-            col1.prop(self, 'mark_curve',icon = 'OUTLINER_OB_CURVE')
-            col1.prop(self, 'mark_font',icon = 'OUTLINER_OB_FONT')
-            col1.prop(self, 'mark_curves',icon = 'OUTLINER_OB_CURVES')
-            col1.prop(self, 'mark_pointcloud',icon = 'OUTLINER_OB_POINTCLOUD')
-            col1.prop(self, 'mark_volume',icon = 'OUTLINER_OB_VOLUME')
-            col1.prop(self, 'mark_greasepencil',icon = 'OUTLINER_OB_GREASEPENCIL')
-            col1.prop(self, 'mark_armature',icon = 'OUTLINER_OB_ARMATURE')
-            col1.prop(self, 'mark_lattice',icon = 'OUTLINER_OB_LATTICE')
-            col1.prop(self, 'mark_empty',icon = 'OUTLINER_OB_EMPTY')
-            col1.prop(self, 'mark_light',icon = 'OUTLINER_OB_LIGHT')
-            col1.prop(self, 'mark_lightprobe',icon = 'OUTLINER_OB_LIGHTPROBE')
-            col1.prop(self, 'mark_camera',icon = 'OUTLINER_OB_CAMERA')
-            col1.prop(self, 'mark_speaker',icon = 'OUTLINER_OB_SPEAKER')
+        if self.mark_objects:
+            col1.prop(self, 'custom_object_types')
+            col1 = col1.column(align=True) 
+            if self.custom_object_types:
+                col1.prop(self, 'mark_mesh',icon = 'OUTLINER_OB_MESH')
+                col1.prop(self, 'mark_surface',icon = 'OUTLINER_OB_SURFACE')
+                col1.prop(self, 'mark_meta',icon = 'OUTLINER_OB_META')
+                col1.prop(self, 'mark_curve',icon = 'OUTLINER_OB_CURVE')
+                col1.prop(self, 'mark_font',icon = 'OUTLINER_OB_FONT')
+                col1.prop(self, 'mark_curves',icon = 'OUTLINER_OB_CURVES')
+                col1.prop(self, 'mark_pointcloud',icon = 'OUTLINER_OB_POINTCLOUD')
+                col1.prop(self, 'mark_volume',icon = 'OUTLINER_OB_VOLUME')
+                col1.prop(self, 'mark_greasepencil',icon = 'OUTLINER_OB_GREASEPENCIL')
+                col1.prop(self, 'mark_armature',icon = 'OUTLINER_OB_ARMATURE')
+                col1.prop(self, 'mark_lattice',icon = 'OUTLINER_OB_LATTICE')
+                col1.prop(self, 'mark_empty',icon = 'OUTLINER_OB_EMPTY')
+                col1.prop(self, 'mark_light',icon = 'OUTLINER_OB_LIGHT')
+                col1.prop(self, 'mark_lightprobe',icon = 'OUTLINER_OB_LIGHTPROBE')
+                col1.prop(self, 'mark_camera',icon = 'OUTLINER_OB_CAMERA')
+                col1.prop(self, 'mark_speaker',icon = 'OUTLINER_OB_SPEAKER')
                
         col2.prop(self, 'mark_materials', icon = 'MATERIAL')
         col2.prop(self, 'mark_worlds', icon = 'WORLD')

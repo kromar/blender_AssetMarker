@@ -38,6 +38,8 @@ else:
 
 
 def process_assets(argv):
+    bpy.ops.wm.previews_clear()
+    #bpy.ops.wm.previews_batch_clear()
     asset_type = argv[1].split()
     if not debug:
         print("asset_type: ", asset_type)    
@@ -143,8 +145,6 @@ def process_assets(argv):
                             clear_assets(ob)
                         
 
-
-
     if 'clear_object' in asset_type:
         for ob in bpy.data.objects:
             clear_assets(ob)
@@ -159,15 +159,12 @@ def process_assets(argv):
         for mat in bpy.data.materials:
             clear_assets(mat)
 
-    """ 
     if 'poses_mark' in asset_type:
-        for pose in bpy.data.poses:
+        for pose in bpy.data.actions:
             mark_assets(pose)
     if 'poses_clear' in asset_type:
-        for pose in bpy.data.poses:
+        for pose in bpy.data.actions:
             clear_assets(pose) 
-    #"""
-
      
     if 'worlds_mark' in asset_type:
         for world in bpy.data.worlds:
@@ -188,8 +185,7 @@ def mark_assets(asset):
     if debug:
         print('    marking: ', asset.name)
     asset.asset_mark()  
-    if not debug:
-        asset.asset_generate_preview()
+    asset.asset_generate_preview()
 
 
 def clear_assets(asset):

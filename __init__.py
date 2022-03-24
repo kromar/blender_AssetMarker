@@ -27,7 +27,7 @@ bl_info = {
     "name": "Asset Marker",
     "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 3),
+    "version": (1, 2, 4),
     "blender": (3, 1, 0),
     "location": "Sidebar",
     "category": "System",
@@ -140,75 +140,75 @@ class AssetWalker(Operator):
     def convert_args_to_cmdlist(self):
         arg_list = []
         if prefs().mark_objects:
-            arg_list.append('mark_object')
+            arg_list.append('mark_object')           
+            
+            if prefs().mark_mesh:
+                arg_list.append('mark_mesh')
+            else:            
+                arg_list.append('clear_mesh')
+            if prefs().mark_surface:
+                arg_list.append('mark_surface')
+            else:            
+                arg_list.append('clear_surface')
+            if prefs().mark_meta:
+                arg_list.append('mark_meta')
+            else:            
+                arg_list.append('clear_meta')
+            if prefs().mark_curve:
+                arg_list.append('mark_curve')
+            else:            
+                arg_list.append('clear_curve')
+            if prefs().mark_font:
+                arg_list.append('mark_font')
+            else:            
+                arg_list.append('clear_font')
+            if prefs().mark_curves:
+                arg_list.append('mark_curves')
+            else:            
+                arg_list.append('clear_curves')
+            if prefs().mark_pointcloud:
+                arg_list.append('mark_pointcloud')
+            else:            
+                arg_list.append('clear_pointcloud')
+            if prefs().mark_volume:
+                arg_list.append('mark_volume')
+            else:            
+                arg_list.append('clear_volume')
+            if prefs().mark_greasepencil:
+                arg_list.append('mark_greasepencil')
+            else:            
+                arg_list.append('clear_greasepencil')
+            if prefs().mark_armature:
+                arg_list.append('mark_armature')
+            else:            
+                arg_list.append('clear_armature')
+            if prefs().mark_lattice:
+                arg_list.append('mark_lattice')
+            else:            
+                arg_list.append('clear_lattice')
+            if prefs().mark_empty:
+                arg_list.append('mark_empty')
+            else:            
+                arg_list.append('clear_empty')
+            if prefs().mark_light:
+                arg_list.append('mark_light')
+            else:            
+                arg_list.append('clear_light')
+            if prefs().mark_lightprobe:
+                arg_list.append('mark_lightprobe')
+            else:            
+                arg_list.append('clear_lightprobe')
+            if prefs().mark_camera:
+                arg_list.append('mark_camera')
+            else:            
+                arg_list.append('clear_camera')
+            if prefs().mark_speaker:
+                arg_list.append('mark_speaker')
+            else:            
+                arg_list.append('clear_speaker')
+
         else:            
             arg_list.append('clear_object')
-
-            
-        if prefs().mark_mesh:
-            arg_list.append('mark_mesh')
-        else:            
-            arg_list.append('clear_mesh')
-        if prefs().mark_surface:
-            arg_list.append('mark_surface')
-        else:            
-            arg_list.append('clear_surface')
-        if prefs().mark_meta:
-            arg_list.append('mark_meta')
-        else:            
-            arg_list.append('clear_meta')
-        if prefs().mark_curve:
-            arg_list.append('mark_curve')
-        else:            
-            arg_list.append('clear_curve')
-        if prefs().mark_font:
-            arg_list.append('mark_font')
-        else:            
-            arg_list.append('clear_font')
-        if prefs().mark_curves:
-            arg_list.append('mark_curves')
-        else:            
-            arg_list.append('clear_curves')
-        if prefs().mark_pointcloud:
-            arg_list.append('mark_pointcloud')
-        else:            
-            arg_list.append('clear_pointcloud')
-        if prefs().mark_volume:
-            arg_list.append('mark_volume')
-        else:            
-            arg_list.append('clear_volume')
-        if prefs().mark_greasepencil:
-            arg_list.append('mark_greasepencil')
-        else:            
-            arg_list.append('clear_greasepencil')
-        if prefs().mark_armature:
-            arg_list.append('mark_armature')
-        else:            
-            arg_list.append('clear_armature')
-        if prefs().mark_lattice:
-            arg_list.append('mark_lattice')
-        else:            
-            arg_list.append('clear_lattice')
-        if prefs().mark_empty:
-            arg_list.append('mark_empty')
-        else:            
-            arg_list.append('clear_empty')
-        if prefs().mark_light:
-            arg_list.append('mark_light')
-        else:            
-            arg_list.append('clear_light')
-        if prefs().mark_lightprobe:
-            arg_list.append('mark_lightprobe')
-        else:            
-            arg_list.append('clear_lightprobe')
-        if prefs().mark_camera:
-            arg_list.append('mark_camera')
-        else:            
-            arg_list.append('clear_camera')
-        if prefs().mark_speaker:
-            arg_list.append('mark_speaker')
-        else:            
-            arg_list.append('clear_speaker')
 
 
         if prefs().mark_materials:

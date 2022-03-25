@@ -22,74 +22,184 @@ import sys
 #avoid creating backup files
 bpy.context.preferences.filepaths.save_version = 0
 
-argv = sys.argv
+argv = sys.argv  
+#argv = [
+#   0:debug_mode
+#   1:asset_type
+# ]
+
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
-
-#print(argv[0], argv[1])
-
-# 0 = objects
-# 1 = materials
-# 2 = meshes
-# 3 = textures
-
-#Object 'name' can't be selected because it is not in View Layer 'Render Layer'!
-for window in bpy.context.window_manager.windows:
-    screen = window.screen
-    for area in screen.areas:
-        if area.type == 'FILE_BROWSER':  
-
-            for v in bpy.data.objects:
-                v.select_set(True)
-                if argv[0] == 'True': 
-                    try:
-                        bpy.ops.file.select()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    except:
-                        pass    
-                else:
-                    v.asset_clear()
-                v.select_set(False)
+debug = False
+if argv[0] == 'True':
+    debug = True
+    print(argv)
+else:
+    debug = False
 
 
+def process_assets(argv):
+    bpy.ops.wm.previews_clear()
+    #bpy.ops.wm.previews_batch_clear()
+    asset_type = argv[1].split()
+    if not debug:
+        print("asset_type: ", asset_type)    
+    if 'mark_object' in asset_type:
+        for ob in bpy.data.objects:
+            for i in bpy.data.scenes:  #only mark objects that are linked to a scene
+                if ob.name in bpy.data.scenes[i.name].objects:
+                    
+                    if ob.type == 'MESH':
+                        if 'mark_mesh' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_mesh' in asset_type:
+                            clear_assets(ob)
 
-            try:
-                for v in bpy.data.materials:
-                    if argv[1] == 'True': 
-                        v.asset_mark()
-                        try:
-                            bpy.ops.file.select()
-                            bpy.ops.ed.lib_id_generate_preview()
-                        except:
-                            pass
-                    else:
-                        v.asset_clear()
-            except:
-                pass
+                    if ob.type == 'SURFACE':
+                        if 'mark_surface' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_surface' in asset_type:
+                            clear_assets(ob)
+                    
+                    if ob.type == 'META':
+                        if 'mark_meta' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_meta' in asset_type:
+                            clear_assets(ob)
+
+                    if ob.type == 'CURVE':    
+                        if 'mark_curve' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_curve' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'FONT':
+                        if 'mark_font' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_font' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'CURVES':
+                        if 'mark_curves' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_curves' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'POINTCLOUD':
+                        if 'mark_pointcloud' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_pointcloud' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'VOLUME':
+                        if 'mark_volume' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_volume' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'GPENCIL':
+                        if 'mark_greasepencil' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_greasepencil' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'ARMATURE':
+                        if 'mark_armature' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_armature' in asset_type:
+                            clear_assets(ob)
+                    
+                    if ob.type == 'LATTICE':
+                        if 'mark_lattice' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_lattice' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'EMPTY':
+                        if 'mark_empty' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_empty' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'LIGHT': 
+                        if 'mark_light' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_light' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'LIGHTPROBE':
+                        if 'mark_lightprobe' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_lightprobe' in asset_type:
+                            clear_assets(ob)
+                        
+                    if ob.type == 'CAMERA':
+                        if 'mark_camera' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_camera' in asset_type:
+                            clear_assets(ob)
+
+                    if ob.type == 'SPEAKER':
+                        if 'mark_speaker' in asset_type:
+                            mark_assets(ob)
+                        if 'clear_speaker' in asset_type:
+                            clear_assets(ob)
+                        
+
+    if 'clear_object' in asset_type:
+        for ob in bpy.data.objects:
+            clear_assets(ob)
+        for me in bpy.data.meshes:
+            clear_assets(me)
+
             
-            try:    
-                for v in bpy.data.meshes:
-                    if argv[2] == 'True': 
-                        v.asset_mark()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    else:
-                        v.asset_clear()
-            except:
-                pass           
+    if 'materials_mark' in asset_type:
+        for mat in bpy.data.materials:
+            mark_assets(mat)    
+    if 'materials_clear' in asset_type:
+        for mat in bpy.data.materials:
+            clear_assets(mat)
 
-            try:
-                for v in bpy.data.textures:
-                    if argv[3] == 'True': 
-                        v.asset_mark()
-                        bpy.ops.ed.lib_id_generate_preview()
-                    else:
-                        v.asset_clear()
-            except:
-                pass
+    if 'poses_mark' in asset_type:
+        for pose in bpy.data.actions:
+            mark_assets(pose)
+    if 'poses_clear' in asset_type:
+        for pose in bpy.data.actions:
+            clear_assets(pose) 
+     
+    if 'worlds_mark' in asset_type:
+        for world in bpy.data.worlds:
+            mark_assets(world)
+    if 'worlds_clear' in asset_type:
+        for world in bpy.data.worlds:
+            clear_assets(world)  
+     
 
-#bpy.ops.file.select()
-#bpy.ops.file.select_all(action='SELECT')
-#bpy.ops.wm.previews_batch_generate()
-#bpy.ops.wm.previews_ensure()
+    #update all previews
+    bpy.ops.wm.previews_ensure()
 
-#save the blend file to store asset marks
-bpy.ops.wm.save_mainfile()
+    #save the blend file to store asset marks
+    bpy.ops.wm.save_mainfile()
+
+
+def mark_assets(asset):
+    if debug:
+        print('    marking: ', asset.name)
+    asset.asset_mark()  
+    asset.asset_generate_preview()
+    #bpy.ops.ed.lib_id_generate_preview()
+
+
+def clear_assets(asset):
+    if debug:
+        print('    clearing: ', asset.name) 
+    asset.asset_clear()
+    asset.use_fake_user = True
+
+
+process_assets(argv=argv)
+
+
+'''
+BLI_assert failed: C:\Repo\BlenderScripts\build_blender\BlenderGit\source\blender\windowmanager\intern\wm_window.c:2315, WM_opengl_context_create(), at 'BLI_thread_is_main()'
+
+'''

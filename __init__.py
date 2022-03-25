@@ -27,8 +27,8 @@ bl_info = {
     "name": "Asset Marker",
     "description": "Mark Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 4),
-    "blender": (3, 1, 0),
+    "version": (1, 2, 5),
+    "blender": (3, 0, 0),
     "location": "Sidebar",
     "category": "System",
     "wiki_url": "https://github.com/kromar/blender_AssetMarker",
@@ -86,37 +86,45 @@ class AssetMarker(Operator):
     
 
     def mark_asset(self, state = False):          
-        for window in bpy.context.window_manager.windows:
-            screen = window.screen
-            for area in screen.areas:
-                if area.type == 'FILE_BROWSER':  
-                    if self.button_input == 'Mark_Objects':                                  
-                        for ob in bpy.data.objects:
-                            ob.select_set(True)
-                            self.set_mark(ob, state)                                                               
-                            #ob.select_set(False)                                    
-                    elif self.button_input == 'Mark_Meshes':
-                        for ob in bpy.data.meshes:
-                            self.set_mark(ob, state)    
-                    elif self.button_input == 'Mark_Materials':
-                        for ob in bpy.data.materials:
-                            self.set_mark(ob, state)  
-                    elif self.button_input == 'Mark_Textures':
-                        for ob in bpy.data.textures:
-                            self.set_mark(ob, state)  
+
+        if self.button_input == 'Mark_Objects':                                  
+            for ob in bpy.data.objects:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)          
+        elif self.button_input == 'Mark_Materials':
+            for ob in bpy.data.materials:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)
+        elif self.button_input == 'Mark_Poses':
+            for ob in bpy.data.actions:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)
+        elif self.button_input == 'Mark_Worlds':
+            for ob in bpy.data.worlds:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)
+
                            
-                                
-    def set_mark(self, ob, state=False):
-        print("set mark: ", ob.name)   
-        if state:
-            ob.asset_mark()
-            try:
-                bpy.ops.file.select()
-                #bpy.ops.ed.lib_id_generate_preview()
-            except:
-                pass                                    
-        else:
-            ob.asset_clear()  
+    def mark_assets(self, asset):
+        if prefs().debug_mode:
+            print('    marking: ', asset.name)
+        asset.asset_mark()  
+        asset.asset_generate_preview()
+
+    def clear_assets(self, asset):
+        if prefs().debug_mode:
+            print('    clearing: ', asset.name) 
+        asset.asset_clear()
+        asset.use_fake_user = True
+        
                         
    
 class AssetWalker(Operator):
@@ -132,8 +140,7 @@ class AssetWalker(Operator):
     library_index: IntProperty()
 
     def execute(self, context): 
-        print("\nRun Asset Crawler")  
-
+        print("\nRun Asset Crawler")
         self.asset_crawler(context)  
         return{'FINISHED'}
 
@@ -245,7 +252,7 @@ class AssetWalker(Operator):
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):
-                    try:
+                    try:                        
                         blend_path = os.path.join(path, name)
                         print("Opening Asset Library: ", blend_path)     #0
                         #""" 
@@ -260,9 +267,17 @@ class AssetWalker(Operator):
                             asset_type,                 #1
                         ], shell=False)  
                         #""" 
+                        
                     except:
-                        print("cant open %, file corrupt?", name)  
+                        print("cant open %s, file corrupt?" % name)  
                 
+                    for window in bpy.context.window_manager.windows:
+                        screen = window.screen
+                        for area in screen.areas:
+                            if area.type == 'FILE_BROWSER':  
+                                #bpy.ops.asset.catalog_new(parent_path='')
+                                #bpy.ops.asset.library_refresh()
+                                pass
             #print("amount of files", len(files))  
 
             """ 
@@ -285,7 +300,7 @@ class AssetMarkerPreferences(AddonPreferences):
         name="current_file", 
         description="current_file", 
         subtype='NONE',
-        default="Mark_Objects, Mark_Meshes, Mark_Materials, Mark_Textures",
+        default="Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds",
         update=AM_PT_AssetMarker.draw)
 
     mark_objects: bpy.props.BoolProperty(
@@ -294,7 +309,7 @@ class AssetMarkerPreferences(AddonPreferences):
             default=True)   
             
     custom_object_types: bpy.props.BoolProperty(
-            name="Customize Object Types",
+            name="Configure Object Types",
             description="debug_mode",
             default=False)  
 
@@ -428,10 +443,7 @@ class AssetMarkerPreferences(AddonPreferences):
 
         # Asset Marker selection
         box = layout.box() 
-        box.label(text='Asset Marker Configuration')
-        box.label(text='Active Buttons will Mark Assets, Inactive Buttons will Clear Assets from the Library')
-        
-        row = box.row()        
+        box.label(text='Asset Marker Configuration')       
         col = box.column()
         split = col.split()   
         col1 = split.column()  
@@ -448,7 +460,8 @@ class AssetMarkerPreferences(AddonPreferences):
                 col1.prop(self, 'mark_meta',icon = 'OUTLINER_OB_META')
                 col1.prop(self, 'mark_curve',icon = 'OUTLINER_OB_CURVE')
                 col1.prop(self, 'mark_font',icon = 'OUTLINER_OB_FONT')
-                col1.prop(self, 'mark_curves',icon = 'OUTLINER_OB_CURVES')
+                if bpy.app.version >= (3,2,0):
+                    col1.prop(self, 'mark_curves',icon = 'OUTLINER_OB_CURVES')
                 col1.prop(self, 'mark_pointcloud',icon = 'OUTLINER_OB_POINTCLOUD')
                 col1.prop(self, 'mark_volume',icon = 'OUTLINER_OB_VOLUME')
                 col1.prop(self, 'mark_greasepencil',icon = 'OUTLINER_OB_GREASEPENCIL')

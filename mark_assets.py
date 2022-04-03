@@ -36,9 +36,46 @@ if argv[0] == 'True':
 else:
     debug = False
 
+def paste_asset(): 
+    #paste from buffer 
+    print("APPEND ASSETS")  
+    
+    '''
+    https://docs.blender.org/api/current/bpy.types.BlendDataLibraries.html
+    '''
+
+    # path to the blend
+    filepath = "D:/GDrive/CG/assetbrowser test/dan.blend"    
+    # name of collection(s) to append or link
+    #coll_name = "MyCollection"   
+    # name of object(s) to append or link
+    obj_name = "Dan"
+    # append, set to true to keep the link to the original file 
+    link = False
+    '''
+    
+    # link all collections starting with 'MyCollection'
+    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+        data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+    # link collection to scene collection
+    for coll in data_to.collections:
+        if coll is not None:
+            bpy.context.scene.collection.children.link(coll)
+    '''
+    # link all objects starting with 'Cube'
+    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+        data_to.objects = [name for name in data_from.objects if name.startswith(obj_name)]
+    #link object to current scene
+    for obj in data_to.objects:
+        if obj is not None:
+            bpy.context.collection.objects.link(obj) # Blender 2.8x
+    
+
+def delete_asset(asset):
+    pass
 
 def process_assets(argv):
-    bpy.ops.wm.previews_clear()
+    #bpy.ops.wm.previews_clear()
     #bpy.ops.wm.previews_batch_clear()
     asset_type = argv[1].split()
     if not debug:
@@ -182,10 +219,10 @@ def process_assets(argv):
 
 
 def mark_assets(asset):
+    asset.asset_mark()  
     if debug:
         print('    marking: ', asset.name)
-    asset.asset_mark()  
-    asset.asset_generate_preview()
+        asset.asset_generate_preview()
     #bpy.ops.ed.lib_id_generate_preview()
 
 
@@ -195,10 +232,10 @@ def clear_assets(asset):
     asset.asset_clear()
     asset.use_fake_user = True
 
-
+paste_asset()
 process_assets(argv=argv)
 
-
+bpy.ops.wm.quit_blender()
 '''
 BLI_assert failed: C:\Repo\BlenderScripts\build_blender\BlenderGit\source\blender\windowmanager\intern\wm_window.c:2315, WM_opengl_context_create(), at 'BLI_thread_is_main()'
 

@@ -256,6 +256,9 @@ class AssetWalker(Operator):
                         blend_path = os.path.join(path, name)
                         print("Opening Asset Library: ", blend_path)     #0
                         #""" 
+                        #copy selected assets to buffer
+                        #
+
                         run([self.blender_path, 
                             blend_path, 
                             '--background', 

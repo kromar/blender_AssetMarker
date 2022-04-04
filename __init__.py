@@ -120,6 +120,7 @@ class AssetMarker(Operator):
         asset.asset_generate_preview()
 
     def clear_assets(self, asset):
+
         if prefs().debug_mode:
             print('    clearing: ', asset.name) 
         asset.asset_clear()
@@ -238,60 +239,80 @@ class AssetWalker(Operator):
         #print(asset_type)
         return asset_type
 
+    def convert_assets_to_cmdlist(self):
+        asset_list = []
+        for ob in bpy.context.selected_objects:
+            asset_list.append(ob.name)
+
+        assets = ' '.join([str(item) for item in asset_list])
+        print("ASSETS: ", assets)
+        return assets
+        
 
     def asset_crawler(self, context):
         # iterating over directory and subdirectory to find all blender files 
         # and mark the desired assets
 
         asset_type = self.convert_args_to_cmdlist()
+        asset_list = self.convert_assets_to_cmdlist()
 
         paths = context.preferences.filepaths
         #print("Asset Library: ", paths.asset_libraries[self.library_index].name)
         lib_path = paths.asset_libraries[self.library_index].path
 
+        blend_list = []
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):
-                    try:                        
-                        blend_path = os.path.join(path, name)
-                        print("Opening Asset Library: ", blend_path)     #0
-                        #""" 
-                        #copy selected assets to buffer
-                        #
-
-                        run([self.blender_path, 
-                            blend_path, 
-                            '--background', 
-                            '--factory-startup',
-                            '--python', 
-                            self.script_path, 
-                            '--', 
-                            str(prefs().debug_mode),    #0
-                            asset_type,                 #1
-                        ], shell=False)  
-                        #""" 
-                        
-                    except:
-                        print("cant open %s, file corrupt?" % name)  
+                    #""" 
+                    #copy selected assets to buffer
+                    # get a list of all blend files and let the user select the 
+                    # library to push the asset to
+                    blend_path = os.path.join(path, name)
+                    blend_list.append(blend_path)   
                 
-                    for window in bpy.context.window_manager.windows:
-                        screen = window.screen
-                        for area in screen.areas:
-                            if area.type == 'FILE_BROWSER':  
-                                #bpy.ops.asset.catalog_new(parent_path='')
-                                #bpy.ops.asset.library_refresh()
-                                pass
-            #print("amount of files", len(files))  
+        for blend_path in blend_list:
+            try:                        
+                #blend_path = os.path.join(path, name)
+                print("List Blends: ", blend_list)
+                print("Opening Asset Library: ", blend_path)     #0
 
-            """ 
-            progress_total = len(files)
-            wm = bpy.context.window_manager
-            wm.progress_begin(0, progress_total)       
-            for i in range(progress_total):
-                wm.progress_update(i)   
-                print(i)
-            wm.progress_end() 
-            #"""
+                run([self.blender_path, 
+                    blend_path, 
+                    '--background', 
+                    '--factory-startup',
+                    '--python', 
+                    self.script_path, 
+                    '--', 
+                    str(prefs().debug_mode),    #0
+                    asset_type,                 #1
+                    blend_path,
+                    asset_list,
+
+                ], shell=False)  
+                #""" 
+                        
+            except:
+                print("cant open %s, file corrupt?" % name)  
+        
+            for window in bpy.context.window_manager.windows:
+                screen = window.screen
+                for area in screen.areas:
+                    if area.type == 'FILE_BROWSER':  
+                        #bpy.ops.asset.catalog_new(parent_path='')
+                        #bpy.ops.asset.library_refresh()
+                        pass
+              
+
+        """ 
+        progress_total = len(files)
+        wm = bpy.context.window_manager
+        wm.progress_begin(0, progress_total)       
+        for i in range(progress_total):
+            wm.progress_update(i)   
+            print(i)
+        wm.progress_end() 
+        #"""
 
         return{'FINISHED'}
 

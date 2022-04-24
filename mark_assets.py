@@ -33,7 +33,6 @@ argv = [
 '''
 
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
-debug = True
 if argv[0] == 'True':
     debug = True
     print(argv)
@@ -42,44 +41,52 @@ else:
 
 def paste_asset(): 
     #paste from buffer 
-    print("APPEND ASSETS")  
+    # https://docs.blender.org/api/current/bpy.types.BlendDataLibraries.html
     
-    '''
-    https://docs.blender.org/api/current/bpy.types.BlendDataLibraries.html
-    '''
 
     # path to the blend
     filepath = argv[2]
-    print("FILEPATH: ", filepath)   
+    print("\nFILEPATH: ", filepath)   
     # name of collection(s) to append or link
     #coll_name = "MyCollection"   
     # name of object(s) to append or link
     if argv[3]:
         assets = argv[3].split()
-        for asset in assets:
-            obj_name = asset
-            print("arrived assset: ", asset)
+        for asset_name in assets:
+            #print("arrived assset: ", asset)
+            # link all objects starting with 'Cube'
+            with bpy.data.libraries.load(filepath, link=False) as (data_target, data_source):
+                print("\nasset_name: ", asset_name, filepath)
+                print("data_source: ", data_source, data_source.objects)
+                print("data_target: ", data_target, data_target.objects)
 
-    '''    
-    # link all collections starting with 'MyCollection'
-    with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
-        data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
-    # link collection to scene collection
-    for coll in data_to.collections:
-        if coll is not None:
-            bpy.context.scene.collection.children.link(coll)
-    '''
-    
-    """ 
-    # link all objects starting with 'Cube'
-    with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
-        data_to.objects = [name for name in data_from.objects if name.startswith(obj_name)]
-    #link object to current scene
-    for obj in data_to.objects:
-        if obj is not None:
-            bpy.context.collection.objects.link(obj) # Blender 2.8x
-    
-    """
+                #if not asset name in target then link asset name object
+                #for name in data_target.objects
+
+
+
+
+            '''    
+            # link all collections starting with 'MyCollection'
+            with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+            # link collection to scene collection
+            for coll in data_to.collections:
+                if coll is not None:
+                    bpy.context.scene.collection.children.link(coll)
+            '''
+            """ 
+            # link all objects starting with 'Cube'
+            with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+                data_to.objects = [name for name in data_from.objects if name.startswith(obj_name)]
+            #link object to current scene
+            for obj in data_to.objects:
+                if obj is not None:
+                    bpy.context.collection.objects.link(obj) # Blender 2.8x
+            
+            """
+            
+
 def delete_asset(asset):
     pass
 
@@ -231,7 +238,7 @@ def mark_assets(asset):
     asset.asset_mark()  
     if debug:
         print('    marking: ', asset.name)
-        asset.asset_generate_preview()
+        #asset.asset_generate_preview()
     #bpy.ops.ed.lib_id_generate_preview()
 
 

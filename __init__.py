@@ -286,7 +286,7 @@ class AssetWalker(Operator):
                     '--', 
                     str(prefs().debug_mode),    #0
                     asset_type,                 #1
-                    blend_path,
+                    os.path.join(bpy.data.filepath),
                     asset_list,
 
                 ], shell=False)  

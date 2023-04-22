@@ -24,10 +24,10 @@ from bpy.props import BoolProperty, StringProperty, EnumProperty, IntProperty
 
 
 bl_info = {
-    "name": "Asset Marker",
-    "description": "Mark Assets in .blend files",
+    "name": "Asset Manager",
+    "description": "Manage your Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 5),
+    "version": (1, 2, 6),
     "blender": (3, 0, 0),
     "location": "Sidebar",
     "category": "System",
@@ -42,23 +42,23 @@ def prefs():
     return user_preferences.addons[__package__].preferences 
 
 
-class AM_PT_AssetMarker(Panel):    
-    bl_label = 'Asset Marker'
+class AM_PT_AssetManager(Panel):    
+    bl_label = 'Asset Manager'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Asset Marker'      
+    bl_category = 'Asset Manager'      
 
     def draw(self, context):       
         current_file = prefs().current_file.replace(",", " ").split()
         layout = self.layout   
         for i in current_file:  
-            layout.operator(operator="scene.asset_marker", text=i, icon='ASSET_MANAGER', emboss=True, depress=False).button_input=i
+            layout.operator(operator="scene.asset_manager", text=i, icon='ASSET_MANAGER', emboss=True, depress=False).button_input=i
         layout.separator()
 
 
-class AssetMarker(Operator):
-    bl_idname = "scene.asset_marker"
-    bl_label = "asset_marker"
+class AssetManager(Operator):
+    bl_idname = "scene.asset_manager"
+    bl_label = "asset_manager"
     bl_description = "mark assets"
     
     button_input: StringProperty()
@@ -293,7 +293,7 @@ class AssetWalker(Operator):
         return{'FINISHED'}
 
 
-class AssetMarkerPreferences(AddonPreferences):
+class AssetManagerPreferences(AddonPreferences):
     bl_idname = __package__
     
     current_file: StringProperty(
@@ -301,7 +301,7 @@ class AssetMarkerPreferences(AddonPreferences):
         description="current_file", 
         subtype='NONE',
         default="Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds",
-        update=AM_PT_AssetMarker.draw)
+        update=AM_PT_AssetManager.draw)
 
     mark_objects: bpy.props.BoolProperty(
             name="Objects",
@@ -426,7 +426,7 @@ class AssetMarkerPreferences(AddonPreferences):
 
         row = asset_col.row(align=True)  # Padding
         row.separator()
-        row.label(text="Asset Marker")
+        row.label(text="Asset Manager")
 
         for i, library in enumerate(paths.asset_libraries):
             name_col.prop(library, "name", text="")
@@ -441,9 +441,9 @@ class AssetMarkerPreferences(AddonPreferences):
         row.operator("preferences.asset_library_add", text="", icon='ADD', emboss=False)
         
 
-        # Asset Marker selection
+        # Asset Manager selection
         box = layout.box() 
-        box.label(text='Asset Marker Configuration')       
+        box.label(text='Asset Manager Configuration')       
         col = box.column()
         split = col.split()   
         col1 = split.column()  
@@ -482,10 +482,10 @@ class AssetMarkerPreferences(AddonPreferences):
 
 
 classes = (
-    AssetMarker,
+    AssetManager,
     AssetWalker,
-    AM_PT_AssetMarker,
-    AssetMarkerPreferences,
+    AM_PT_AssetManager,
+    AssetManagerPreferences,
     )
 
 

@@ -1,6 +1,6 @@
-# blender_AssetMarker
+# blender_AssetManager
 
-Asset Marker allowes you to mark all assets of a specific type in your blend file or specific Asset types in a Asset Library.
+Asset Manager allowes you to mark all assets of a specific type in your blend file or specific Asset types in a Asset Library.
 
 The addon comes with a quick accesable Sidebar Panel to mark/unmark Asset Types in your current Scene
 ![image](https://user-images.githubusercontent.com/1472884/128597041-012d6359-6d03-40b6-bd2f-3dbaf2b3fef2.png)

@@ -43,7 +43,7 @@ def process_assets(argv):
     asset_type = argv[1].split()
     if not debug:
         print("asset_type: ", asset_type)    
-    if 'mark_object' in asset_type:
+    if 'mark_objects' in asset_type:
         for ob in bpy.data.objects:
             for i in bpy.data.scenes:  #only mark objects that are linked to a scene
                 if ob.name in bpy.data.scenes[i.name].objects:
@@ -152,26 +152,33 @@ def process_assets(argv):
             clear_assets(me)
 
             
-    if 'materials_mark' in asset_type:
+    if 'mark_materials' in asset_type:
         for mat in bpy.data.materials:
             mark_assets(mat)    
-    if 'materials_clear' in asset_type:
+    if 'clear_materials' in asset_type:
         for mat in bpy.data.materials:
             clear_assets(mat)
 
-    if 'poses_mark' in asset_type:
+    if 'mark_poses' in asset_type:
         for pose in bpy.data.actions:
             mark_assets(pose)
-    if 'poses_clear' in asset_type:
+    if 'clear_poses' in asset_type:
         for pose in bpy.data.actions:
             clear_assets(pose) 
      
-    if 'worlds_mark' in asset_type:
+    if 'mark_worlds' in asset_type:
         for world in bpy.data.worlds:
             mark_assets(world)
-    if 'worlds_clear' in asset_type:
+    if 'clear_worlds' in asset_type:
         for world in bpy.data.worlds:
-            clear_assets(world)  
+            clear_assets(world)              
+     
+    if 'mark_collections' in asset_type:
+        for collection in bpy.data.collections:
+            mark_assets(collection)
+    if 'clear_collections' in asset_type:
+        for collection in bpy.data.collections:
+            clear_assets(collection)  
      
 
     #update all previews
@@ -186,8 +193,6 @@ def mark_assets(asset):
         print('    marking: ', asset.name)
     asset.asset_mark()  
     asset.asset_generate_preview()
-    #bpy.ops.ed.lib_id_generate_preview()
-
 
 def clear_assets(asset):
     if debug:

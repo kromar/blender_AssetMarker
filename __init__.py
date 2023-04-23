@@ -81,30 +81,39 @@ class AssetManager(Operator):
         else:
             self.asset_marked = True  
         self.mark_asset(self.asset_marked)   
-
+        
         return{'FINISHED'}
     
 
-    def mark_asset(self, state = False):          
+    def mark_asset(self, state = False):       
+        if self.button_input == 'Mark_Collections':                                  
+            for ob in bpy.data.collections:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)      
 
-        if self.button_input == 'Mark_Objects':                                  
+        elif self.button_input == 'Mark_Objects':                                  
             for ob in bpy.data.objects:
                 if state:
                     self.mark_assets(ob) 
                 else:
-                    self.clear_assets(ob)          
+                    self.clear_assets(ob)    
+
         elif self.button_input == 'Mark_Materials':
             for ob in bpy.data.materials:
                 if state:
                     self.mark_assets(ob) 
                 else:
                     self.clear_assets(ob)
+
         elif self.button_input == 'Mark_Poses':
             for ob in bpy.data.actions:
                 if state:
                     self.mark_assets(ob) 
                 else:
                     self.clear_assets(ob)
+
         elif self.button_input == 'Mark_Worlds':
             for ob in bpy.data.worlds:
                 if state:
@@ -118,6 +127,7 @@ class AssetManager(Operator):
             print('    marking: ', asset.name)
         asset.asset_mark()  
         asset.asset_generate_preview()
+        bpy.ops.ed.lib_id_generate_preview()
 
     def clear_assets(self, asset):
         if prefs().debug_mode:
@@ -147,68 +157,83 @@ class AssetWalker(Operator):
     def convert_args_to_cmdlist(self):
         arg_list = []
         if prefs().mark_objects:
-            arg_list.append('mark_object')           
-            
+            arg_list.append('mark_objects')
+
             if prefs().mark_mesh:
                 arg_list.append('mark_mesh')
             else:            
                 arg_list.append('clear_mesh')
+
             if prefs().mark_surface:
                 arg_list.append('mark_surface')
             else:            
                 arg_list.append('clear_surface')
+
             if prefs().mark_meta:
                 arg_list.append('mark_meta')
             else:            
                 arg_list.append('clear_meta')
+
             if prefs().mark_curve:
                 arg_list.append('mark_curve')
             else:            
                 arg_list.append('clear_curve')
+
             if prefs().mark_font:
                 arg_list.append('mark_font')
             else:            
                 arg_list.append('clear_font')
+
             if prefs().mark_curves:
                 arg_list.append('mark_curves')
             else:            
                 arg_list.append('clear_curves')
+
             if prefs().mark_pointcloud:
                 arg_list.append('mark_pointcloud')
             else:            
                 arg_list.append('clear_pointcloud')
+
             if prefs().mark_volume:
                 arg_list.append('mark_volume')
             else:            
                 arg_list.append('clear_volume')
+
             if prefs().mark_greasepencil:
                 arg_list.append('mark_greasepencil')
             else:            
                 arg_list.append('clear_greasepencil')
+
             if prefs().mark_armature:
                 arg_list.append('mark_armature')
             else:            
                 arg_list.append('clear_armature')
+
             if prefs().mark_lattice:
                 arg_list.append('mark_lattice')
             else:            
                 arg_list.append('clear_lattice')
+
             if prefs().mark_empty:
                 arg_list.append('mark_empty')
             else:            
                 arg_list.append('clear_empty')
+
             if prefs().mark_light:
                 arg_list.append('mark_light')
             else:            
                 arg_list.append('clear_light')
+
             if prefs().mark_lightprobe:
                 arg_list.append('mark_lightprobe')
             else:            
                 arg_list.append('clear_lightprobe')
+
             if prefs().mark_camera:
                 arg_list.append('mark_camera')
             else:            
                 arg_list.append('clear_camera')
+
             if prefs().mark_speaker:
                 arg_list.append('mark_speaker')
             else:            
@@ -218,20 +243,25 @@ class AssetWalker(Operator):
             arg_list.append('clear_object')
 
 
-        if prefs().mark_materials:
-            arg_list.append('materials_mark')
+        if prefs().mark_collections:
+            arg_list.append('mark_collections')
         else:            
-            arg_list.append('materials_clear')
+            arg_list.append('clear_collections')
+
+        if prefs().mark_materials:
+            arg_list.append('mark_materials')
+        else:            
+            arg_list.append('clear_materials')
 
         if prefs().mark_poses:
-            arg_list.append('poses_mark')
+            arg_list.append('mark_poses')
         else:            
-            arg_list.append('poses_clear')
+            arg_list.append('clear_poses')
 
         if prefs().mark_worlds:
-            arg_list.append('worlds_mark')
+            arg_list.append('mark_worlds')
         else:            
-            arg_list.append('worlds_clear')
+            arg_list.append('clear_worlds')
 
         asset_type = ' '.join([str(item) for item in arg_list])
         #print(arg_list)
@@ -251,26 +281,21 @@ class AssetWalker(Operator):
 
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
-                if name.endswith('.blend'):
-                    try:                        
-                        blend_path = os.path.join(path, name)
-                        print("Opening Asset Library: ", blend_path)     #0
-                        #""" 
-                        run([self.blender_path, 
-                            blend_path, 
-                            '--background', 
-                            '--factory-startup',
-                            '--python', 
-                            self.script_path, 
-                            '--', 
-                            str(prefs().debug_mode),    #0
-                            asset_type,                 #1
-                        ], shell=False)  
-                        #""" 
-                        
-                    except:
-                        print("cant open %s, file corrupt?" % name)  
-                
+                if name.endswith('.blend'):                   
+                    blend_path = os.path.join(path, name)
+                    print("Opening Asset Library: ", blend_path)     #0
+
+                    run([self.blender_path, 
+                        blend_path, 
+                        '--background', 
+                        '--factory-startup',
+                        '--python', 
+                        self.script_path, 
+                        '--', 
+                        str(prefs().debug_mode),    #0
+                        asset_type,                 #1
+                    ], shell=True)  
+                    
                     for window in bpy.context.window_manager.windows:
                         screen = window.screen
                         for area in screen.areas:
@@ -280,6 +305,8 @@ class AssetWalker(Operator):
                                 pass
             #print("amount of files", len(files))  
 
+
+            # progress indicator
             """ 
             progress_total = len(files)
             wm = bpy.context.window_manager
@@ -289,7 +316,8 @@ class AssetWalker(Operator):
                 print(i)
             wm.progress_end() 
             #"""
-
+        
+        #bpy.ops.asset.library_refresh()
         return{'FINISHED'}
 
 
@@ -300,9 +328,14 @@ class AssetManagerPreferences(AddonPreferences):
         name="current_file", 
         description="current_file", 
         subtype='NONE',
-        default="Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds",
+        default="Mark_Collections, Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds",
         update=AM_PT_AssetManager.draw)
 
+    mark_collections: bpy.props.BoolProperty(
+            name="Collections",
+            description="All Collections will be marked as Assets",
+            default=False)  
+    
     mark_objects: bpy.props.BoolProperty(
             name="Objects",
             description="All Objects will be marked as Assets",
@@ -450,9 +483,10 @@ class AssetManagerPreferences(AddonPreferences):
         col2 = split.column()  
         col3 = split.column()  
 
+        col1.prop(self, 'mark_collections',icon = 'OUTLINER_COLLECTION')
         col1.prop(self, 'mark_objects',icon = 'OBJECT_DATA')
         if self.mark_objects:
-            col1.prop(self, 'custom_object_types')
+            col1.prop(self, 'custom_object_types')            
             col1 = col1.column(align=True) 
             if self.custom_object_types:
                 col1.prop(self, 'mark_mesh',icon = 'OUTLINER_OB_MESH')

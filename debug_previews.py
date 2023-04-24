@@ -30,7 +30,7 @@ def mark_assets(asset):
     print('    ', asset.name)
     asset.asset_mark()  
     asset.asset_generate_preview()
-    bpy.ops.ed.lib_id_generate_preview()
+    #bpy.ops.ed.lib_id_generate_preview()
 
 def clear_assets(asset):
     print('    ', asset.name) 

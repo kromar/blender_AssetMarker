@@ -127,14 +127,12 @@ class AssetManager(Operator):
             print('    marking: ', asset.name)
         asset.asset_mark()  
         asset.asset_generate_preview()
-        bpy.ops.ed.lib_id_generate_preview()
 
     def clear_assets(self, asset):
         if prefs().debug_mode:
             print('    clearing: ', asset.name) 
         asset.asset_clear()
-        asset.use_fake_user = True
-        
+        asset.use_fake_user = True        
                         
    
 class AssetWalker(Operator):

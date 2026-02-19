@@ -121,16 +121,23 @@ class AssetManager(Operator):
                 else:
                     self.clear_assets(ob)
 
+        elif self.button_input == 'Mark_NodeGroups':
+            for ob in bpy.data.node_groups:
+                if state:
+                    self.mark_assets(ob) 
+                else:
+                    self.clear_assets(ob)
+
                            
     def mark_assets(self, asset):
         if prefs().debug_mode:
-            print('    marking: ', asset.name)
+            print('    Mark as Asset 1: ', asset.name)
         asset.asset_mark()  
         asset.asset_generate_preview()
 
     def clear_assets(self, asset):
         if prefs().debug_mode:
-            print('    clearing: ', asset.name) 
+            print('    Clear Asset 1: ', asset.name) 
         asset.asset_clear()
         asset.use_fake_user = True        
                         
@@ -260,6 +267,11 @@ class AssetWalker(Operator):
             arg_list.append('mark_worlds')
         else:            
             arg_list.append('clear_worlds')
+            
+        if prefs().mark_nodegroups:
+            arg_list.append('mark_nodegroups')
+        else:            
+            arg_list.append('clear_nodegroups')
 
         asset_type = ' '.join([str(item) for item in arg_list])
         #print(arg_list)
@@ -424,11 +436,15 @@ class AssetManagerPreferences(AddonPreferences):
             name="Worlds",
             description="All Worlds will be marked as Assets",
             default=False)  
+    mark_nodegroups: bpy.props.BoolProperty(
+            name="Node Groups",
+            description="All Node Groups will be marked as Assets",
+            default=False)  
  
     debug_mode: bpy.props.BoolProperty(
             name="debug_mode",
             description="debug_mode",
-            default=False)  
+            default=True)  
             
      
     
@@ -508,6 +524,7 @@ class AssetManagerPreferences(AddonPreferences):
         col2.prop(self, 'mark_materials', icon = 'MATERIAL')
         col2.prop(self, 'mark_worlds', icon = 'WORLD')
         col3.prop(self, 'mark_poses', icon = 'POSE_HLT')
+        col3.prop(self, 'mark_nodegroups', icon = 'NODETREE')
 
         #template_list(listtype_name, list_id, dataptr, propname, active_dataptr, active_propname, item_dyntip_propname='', rows=5, maxrows=5, type='DEFAULT', columns=9, sort_reverse=False, sort_lock=False)
 

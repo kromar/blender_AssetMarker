@@ -29,7 +29,8 @@ argv = sys.argv
 # ]
 
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
-debug = False
+debug = True
+
 if argv[0] == 'True':
     debug = True
     print(argv)
@@ -39,6 +40,16 @@ else:
 
 def process_assets(argv):
     bpy.ops.wm.previews_clear()
+    
+    # 1. store render engine and switch to EEVEE for preview creation
+    render_engine = bpy.context.scene.render.engine    
+    bpy.context.scene.render.engine = 'BLENDER_EEVEE'
+
+    # 2. Lower the samples so the "complex shader" doesn't choke
+    # This ensures each thumbnail takes milliseconds, not minutes
+    render_samples = bpy.context.scene.eevee.taa_render_samples 
+    bpy.context.scene.eevee.taa_render_samples = 1
+
     #bpy.ops.wm.previews_batch_clear()
     asset_type = argv[1].split()
     if not debug:
@@ -180,23 +191,32 @@ def process_assets(argv):
         for collection in bpy.data.collections:
             clear_assets(collection)  
      
-
-    #update all previews
-    bpy.ops.wm.previews_ensure()
+    if 'mark_nodegroups' in asset_type:
+        for group in bpy.data.node_groups:
+            mark_assets(group)
+    if 'clear_nodegroups' in asset_type:
+        for group in bpy.data.node_groups:
+            clear_assets(group)   
+    
+    #restore render engine
+    bpy.context.scene.eevee.taa_render_samples = render_samples
+    bpy.context.scene.render.engine = render_engine
 
     #save the blend file to store asset marks
+    print('save_mainfile')
     bpy.ops.wm.save_mainfile()
 
 
 def mark_assets(asset):
     if debug:
-        print('    marking: ', asset.name)
+        print('    Mark as Asset: ', asset.name)
     asset.asset_mark()  
     asset.asset_generate_preview()
 
+
 def clear_assets(asset):
     if debug:
-        print('    clearing: ', asset.name) 
+        print('    Clear Asset: ', asset.name) 
     asset.asset_clear()
     asset.use_fake_user = True
 

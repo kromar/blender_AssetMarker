@@ -338,110 +338,126 @@ class AssetManagerPreferences(AddonPreferences):
         name="current_file", 
         description="current_file", 
         subtype='NONE',
-        default="Mark_Collections, Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds",
+        default="Mark_Collections, Mark_Objects, Mark_Materials, Mark_Poses, Mark_Worlds, Mark_NodeGroups",
         update=AM_PT_AssetManager.draw)
 
-    mark_collections: bpy.props.BoolProperty(
+    mark_collections: BoolProperty(
             name="Collections",
             description="All Collections will be marked as Assets",
             default=False)  
     
-    mark_objects: bpy.props.BoolProperty(
+    mark_objects: BoolProperty(
             name="Objects",
             description="All Objects will be marked as Assets",
             default=True)   
             
-    custom_object_types: bpy.props.BoolProperty(
+    custom_object_types: BoolProperty(
             name="Configure Object Types",
             description="debug_mode",
             default=False)  
 
-    mark_mesh: bpy.props.BoolProperty(
+    mark_mesh: BoolProperty(
             name="Mesh",
             description="All Meshes will be marked as Assets",
             default=True)  
-    mark_surface: bpy.props.BoolProperty(
+    
+    mark_surface: BoolProperty(
             name="Surface",
             description="All Surfaces will be marked as Assets",
             default=True) 
-    mark_meta: bpy.props.BoolProperty(
+    
+    mark_meta: BoolProperty(
             name="Meta",
             description="All Metas will be marked as Assets",
             default=True) 
 
-
-    mark_curve: bpy.props.BoolProperty(
+    mark_curve: BoolProperty(
             name="Curve",
             description="All Curves will be marked as Assets",
             default=True) 
-    mark_font: bpy.props.BoolProperty(
+    
+    mark_font: BoolProperty(
             name="Font",
             description="All Fonts will be marked as Assets",
             default=True) 
-    mark_curves: bpy.props.BoolProperty(
+    
+    mark_curves: BoolProperty(
             name="Curves",
             description="All Curves will be marked as Assets",
             default=True) 
-    mark_pointcloud: bpy.props.BoolProperty(
+    
+    mark_pointcloud: BoolProperty(
             name="Pointcloud",
             description="All Pointclouds will be marked as Assets",
             default=True) 
-    mark_volume: bpy.props.BoolProperty(
+    
+    mark_volume: BoolProperty(
             name="Volume",
             description="All Volumes will be marked as Assets",
             default=True) 
-    mark_greasepencil: bpy.props.BoolProperty(
+    
+    mark_greasepencil: BoolProperty(
             name="Grease Pencil",
             description="All Grease Pencils will be marked as Assets",
             default=True) 
-    mark_armature: bpy.props.BoolProperty(
+    
+    mark_armature: BoolProperty(
             name="Armatures",
             description="All Armatures will be marked as Assets",
             default=True) 
-    mark_lattice: bpy.props.BoolProperty(
+    
+    mark_lattice: BoolProperty(
             name="Lattice",
             description="All Lattices will be marked as Assets",
             default=True) 
-    mark_empty: bpy.props.BoolProperty(
+    
+    mark_empty: BoolProperty(
             name="Empties",
             description="All Empties will be marked as Assets",
             default=True) 
-    mark_light: bpy.props.BoolProperty(
+    
+    mark_light: BoolProperty(
             name="Light",
             description="All Lights will be marked as Assets",
             default=True) 
-    mark_lightprobe: bpy.props.BoolProperty(
+    
+    mark_lightprobe: BoolProperty(
             name="Lightprobe",
             description="All Lightprobes will be marked as Assets",
             default=True) 
-    mark_camera: bpy.props.BoolProperty(
+    
+    mark_camera: BoolProperty(
             name="Camera",
             description="All Cameras will be marked as Assets",
             default=True) 
-    mark_speaker: bpy.props.BoolProperty(
+    
+    mark_speaker: BoolProperty(
             name="Speaker",
             description="All Speakers will be marked as Assets",
             default=True) 
                
 
-    mark_materials: bpy.props.BoolProperty(
+    mark_materials: BoolProperty(
             name="Materials",
             description="All Materials will be marked as Assets",
-            default=True)                    
-    mark_poses: bpy.props.BoolProperty(
+            default=True)   
+                     
+    mark_poses: BoolProperty(
             name="Poses",
             description="All Poses will be marked as Assets",
-            default=False)   
-    mark_worlds: bpy.props.BoolProperty(
+            default=False) 
+      
+    mark_worlds: BoolProperty(
             name="Worlds",
             description="All Worlds will be marked as Assets",
             default=False)  
-    mark_nodegroups: bpy.props.BoolProperty(
+    
+    mark_nodegroups: BoolProperty(
             name="Node Groups",
             description="All Node Groups will be marked as Assets",
             default=False)  
  
-    debug_mode: bpy.props.BoolProperty(
+    debug_mode: BoolProperty(
             name="debug_mode",
             description="debug_mode",
             default=True)  

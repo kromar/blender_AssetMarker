@@ -20,7 +20,7 @@ import bpy
 import os   
 from subprocess import run
 from bpy.types import AddonPreferences, Operator, Panel
-from bpy.props import BoolProperty, StringProperty, EnumProperty, IntProperty
+from bpy.props import BoolProperty, StringProperty, IntProperty
 
 
 bl_info = {
@@ -157,6 +157,9 @@ class AssetWalker(Operator):
     def execute(self, context): 
         print("\nRun Asset Crawler")
         self.asset_crawler(context)  
+        
+        # Refresh asset library to update previews
+        bpy.ops.asset.library_refresh()
         return{'FINISHED'}
 
     def convert_args_to_cmdlist(self):
@@ -282,7 +285,6 @@ class AssetWalker(Operator):
     def asset_crawler(self, context):
         # iterating over directory and subdirectory to find all blender files 
         # and mark the desired assets
-
         asset_type = self.convert_args_to_cmdlist()
 
         paths = context.preferences.filepaths
@@ -327,7 +329,6 @@ class AssetWalker(Operator):
             wm.progress_end() 
             #"""
         
-        #bpy.ops.asset.library_refresh()
         return{'FINISHED'}
 
 
@@ -546,11 +547,64 @@ class AssetManagerPreferences(AddonPreferences):
 
 
 
+
+class ASSETBROWSER_MT_asset_manager_menu(bpy.types.Menu):
+    bl_label = "Asset Manager"
+    bl_idname = "ASSETBROWSER_MT_asset_manager_menu"
+
+    def draw(self, _context):
+        layout = self.layout
+        layout.operator("scene.asset_remove", icon='TRASH')
+        #layout.operator("scene.asset_manager", text="Mark Assets")
+        #layout.operator("scene.asset_walker", text="Crawl Library")
+
+
+class RemoveAsset(Operator):
+    bl_idname = "scene.asset_remove"
+    bl_label = "Remove Selected Assets"
+    bl_description = "Remove asset mark from selected assets"
+    
+    def execute(self, _context):
+        # for selected asset, open the source blend file, clear the asset mark and save the blend file
+        for asset in bpy.context.selected_assets:
+            print("Asset: ", asset.name)
+            print("  Asset path: ", asset.full_library_path)
+            print("  Asset type: ", asset.id_type)
+            
+            # open the blend file, clear the asset mark and save the blend file
+            blend_path = asset.full_library_path
+            run([bpy.app.binary_path, 
+                blend_path, 
+                '--background', 
+                '--factory-startup',
+                '--python', 
+                os.path.join(os.path.abspath(os.path.dirname(__file__)), 'remove_asset.py'), 
+                '--', 
+                str(prefs().debug_mode),      #0
+                str(asset.id_type),           #1
+                str(asset.name),              #2
+            ], shell=True)
+
+        # Refresh asset library to update previews
+        bpy.ops.asset.library_refresh()
+        
+        return {'FINISHED'}
+
+
+def assetbrowser_menu_draw(self, _context):
+    self.layout.menu("ASSETBROWSER_MT_asset_manager_menu")
+
+bpy.types.ASSETBROWSER_MT_editor_menus.append(assetbrowser_menu_draw)
+    
+
+
 classes = (
+    RemoveAsset,
     AssetManager,
     AssetWalker,
     AM_PT_AssetManager,
     AssetManagerPreferences,
+    ASSETBROWSER_MT_asset_manager_menu,
     )
 
 

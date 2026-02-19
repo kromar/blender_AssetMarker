@@ -212,6 +212,7 @@ def mark_assets(asset):
         if debug:
             print('    Mark as Asset: ', asset.name)
         asset.asset_mark()  
+        #bpy.ops.ed.lib_id_generate_preview_from_object()
         asset.asset_generate_preview()
 
 

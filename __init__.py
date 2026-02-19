@@ -27,7 +27,7 @@ bl_info = {
     "name": "Asset Manager",
     "description": "Manage your Assets in .blend files",
     "author": "Daniel Grauer",
-    "version": (1, 2, 6),
+    "version": (1, 3, 0),
     "blender": (3, 0, 0),
     "location": "Sidebar",
     "category": "System",
@@ -147,9 +147,9 @@ class AssetWalker(Operator):
     bl_label = "Mark Assets"
     bl_description = "mark library assets"
     
-    blender_path = bpy.app.binary_path
-    addon_path =  os.path.abspath(os.path.dirname(__file__))
-    script_path = os.path.join(addon_path, 'mark_assets.py')  
+    blender_path: str = bpy.app.binary_path
+    addon_path: str = os.path.abspath(os.path.dirname(__file__))
+    script_path: str = os.path.join(addon_path, 'mark_assets.py')  
     
     button_input: StringProperty()      
     library_index: IntProperty()
@@ -158,8 +158,6 @@ class AssetWalker(Operator):
         print("\nRun Asset Crawler")
         self.asset_crawler(context)  
         
-        # Refresh asset library to update previews
-        bpy.ops.asset.library_refresh()
         return{'FINISHED'}
 
     def convert_args_to_cmdlist(self):
@@ -277,8 +275,6 @@ class AssetWalker(Operator):
             arg_list.append('clear_nodegroups')
 
         asset_type = ' '.join([str(item) for item in arg_list])
-        #print(arg_list)
-        #print(asset_type)
         return asset_type
 
 
@@ -288,14 +284,22 @@ class AssetWalker(Operator):
         asset_type = self.convert_args_to_cmdlist()
 
         paths = context.preferences.filepaths
-        #print("Asset Library: ", paths.asset_libraries[self.library_index].name)
         lib_path = paths.asset_libraries[self.library_index].path
+
+        # Count total files first
+        total_files = 0
+        for path, dirc, files in os.walk(lib_path):
+            total_files += len([f for f in files if f.endswith('.blend')])
+        
+        wm = bpy.context.window_manager
+        wm.progress_begin(0, total_files)
+        current_file = 0
 
         for path, dirc, files in os.walk(lib_path):          
             for name in files:
                 if name.endswith('.blend'):                   
                     blend_path = os.path.join(path, name)
-                    print("Opening Asset Library: ", blend_path)     #0
+                    print("Opening Asset Library: ", blend_path)
 
                     run([self.blender_path, 
                         blend_path, 
@@ -304,31 +308,21 @@ class AssetWalker(Operator):
                         '--python', 
                         self.script_path, 
                         '--', 
-                        str(prefs().debug_mode),    #0
-                        asset_type,                 #1
-                    ], shell=True)  
+                        str(prefs().debug_mode), #arg 0
+                        asset_type,  #arg 1
+                    ], shell=True)
+                    
+                    # Update progress after processing each file
+                    current_file += 1
+                    wm.progress_update(current_file)
                     
                     for window in bpy.context.window_manager.windows:
                         screen = window.screen
                         for area in screen.areas:
                             if area.type == 'FILE_BROWSER':  
-                                #bpy.ops.asset.catalog_new(parent_path='')
-                                #bpy.ops.asset.library_refresh()
                                 pass
-            #print("amount of files", len(files))  
-
-
-            # progress indicator
-            """ 
-            progress_total = len(files)
-            wm = bpy.context.window_manager
-            wm.progress_begin(0, progress_total)       
-            for i in range(progress_total):
-                wm.progress_update(i)   
-                print(i)
-            wm.progress_end() 
-            #"""
         
+        wm.progress_end()
         return{'FINISHED'}
 
 
@@ -565,8 +559,19 @@ class RemoveAsset(Operator):
     bl_description = "Remove asset mark from selected assets"
     
     def execute(self, _context):
+        # Count total assets first
+        selected_assets = list(bpy.context.selected_assets)
+        total_assets = len(selected_assets)
+        
+        if total_assets == 0:
+            return {'FINISHED'}
+        
+        wm = bpy.context.window_manager
+        wm.progress_begin(0, total_assets)
+        current_asset = 0
+        
         # for selected asset, open the source blend file, clear the asset mark and save the blend file
-        for asset in bpy.context.selected_assets:
+        for asset in selected_assets:
             print("Asset: ", asset.name)
             print("  Asset path: ", asset.full_library_path)
             print("  Asset type: ", asset.id_type)
@@ -580,11 +585,17 @@ class RemoveAsset(Operator):
                 '--python', 
                 os.path.join(os.path.abspath(os.path.dirname(__file__)), 'remove_asset.py'), 
                 '--', 
-                str(prefs().debug_mode),      #0
-                str(asset.id_type),           #1
-                str(asset.name),              #2
+                str(prefs().debug_mode),      #arg 0
+                str(asset.id_type),           #arg 1
+                str(asset.name),              #arg 2
             ], shell=True)
+            
+            # Update progress after processing each asset
+            current_asset += 1
+            wm.progress_update(current_asset)
 
+        wm.progress_end()
+        
         # Refresh asset library to update previews
         bpy.ops.asset.library_refresh()
         

@@ -31,8 +31,8 @@ bl_info = {
     "blender": (3, 0, 0),
     "location": "Sidebar",
     "category": "System",
-    "wiki_url": "https://github.com/kromar/blender_AssetMarker",
-    "tracker_url": "https://github.com/kromar/blender_AssetMarker/issues",
+    "wiki_url": "https://github.com/kromar/blender_AssetManager",
+    "tracker_url": "https://github.com/kromar/blender_AssetManager/issues",
 }
 
 

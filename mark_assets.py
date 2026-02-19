@@ -54,6 +54,7 @@ def process_assets(argv):
     asset_type = argv[1].split()
     if not debug:
         print("asset_type: ", asset_type)    
+
     if 'mark_objects' in asset_type:
         for ob in bpy.data.objects:
             for i in bpy.data.scenes:  #only mark objects that are linked to a scene
@@ -161,7 +162,6 @@ def process_assets(argv):
             clear_assets(ob)
         for me in bpy.data.meshes:
             clear_assets(me)
-
             
     if 'mark_materials' in asset_type:
         for mat in bpy.data.materials:
@@ -201,24 +201,26 @@ def process_assets(argv):
     #restore render engine
     bpy.context.scene.eevee.taa_render_samples = render_samples
     bpy.context.scene.render.engine = render_engine
-
+    
     #save the blend file to store asset marks
     print('save_mainfile')
     bpy.ops.wm.save_mainfile()
 
 
 def mark_assets(asset):
-    if debug:
-        print('    Mark as Asset: ', asset.name)
-    asset.asset_mark()  
-    asset.asset_generate_preview()
+    if asset.asset_data is None:
+        if debug:
+            print('    Mark as Asset: ', asset.name)
+        asset.asset_mark()  
+        asset.asset_generate_preview()
 
 
 def clear_assets(asset):
-    if debug:
-        print('    Clear Asset: ', asset.name) 
-    asset.asset_clear()
-    asset.use_fake_user = True
+    if asset.asset_data is not None:
+        if debug:
+            print('    Clear Asset: ', asset.name)
+        asset.asset_clear()
+        asset.use_fake_user = True
 
 
 process_assets(argv=argv)
